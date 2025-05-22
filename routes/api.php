@@ -123,5 +123,7 @@ Route::middleware(['auth:sanctum', 'admin'])->prefix('admin')->group(function ()
 
 });
 
-
-
+// Tap Payments Routes
+Route::prefix('tap-payments')->group(function () {
+    require __DIR__ . '/tap-payments.php';
+});
