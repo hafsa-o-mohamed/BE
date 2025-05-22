@@ -1,0 +1,355 @@
+openapi: 3.0.3
+info:
+  title: Tap Payments API
+  description: |
+    API for processing payments through Tap Payments with Apple Pay integration.
+    
+    This API allows clients to process Apple Pay payments and receive webhook notifications
+    from Tap Payments.
+  version: 1.0.0
+  contact:
+    name: Development Team
+servers:
+  - url: /api
+    description: API base URL
+tags:
+  - name: Payments
+    description: Payment processing endpoints
+  - name: Webhooks
+    description: Webhook notification endpoints
+
+paths:
+  /tap-payments/charges:
+    post:
+      tags:
+        - Payments
+      summary: Process Apple Pay payment
+      description: |
+        Process a payment using Apple Pay token.
+        
+        This endpoint accepts an Apple Pay token along with payment details,
+        converts it to a Tap Payments token, and creates a charge.
+      operationId: createCharge
+      security:
+        - sanctum: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ApplePayRequest'
+      responses:
+        '200':
+          description: Payment processed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChargeResponse'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+        '422':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrorResponse'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  
+  /tap-payments/webhook:
+    post:
+      tags:
+        - Webhooks
+      summary: Receive webhook notifications from Tap Payments
+      description: |
+        Endpoint to receive webhook notifications from Tap Payments.
+        
+        This endpoint processes webhook notifications for events such as
+        successful charges, failed charges, etc.
+      operationId: webhook
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WebhookRequest'
+      responses:
+        '200':
+          description: Webhook processed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WebhookResponse'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  securitySchemes:
+    sanctum:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Laravel Sanctum authentication
+  
+  schemas:
+    ApplePayRequest:
+      type: object
+      required:
+        - amount
+        - customer_name
+        - customer_email
+        - token_data
+      properties:
+        amount:
+          type: number
+          format: float
+          minimum: 0.1
+          example: 10.500
+          description: Payment amount
+        currency:
+          type: string
+          default: KWD
+          minLength: 3
+          maxLength: 3
+          example: KWD
+          description: Payment currency (ISO 4217 code)
+        customer_name:
+          type: string
+          example: John Doe
+          description: Customer name
+        customer_email:
+          type: string
+          format: email
+          example: john.doe@example.com
+          description: Customer email
+        customer_phone:
+          type: string
+          example: "96512345678"
+          description: Customer phone number
+        description:
+          type: string
+          example: Payment for order #12345
+          description: Payment description
+        reference_id:
+          type: string
+          example: order_12345
+          description: External reference ID
+        token_data:
+          type: object
+          required:
+            - data
+            - header
+            - signature
+            - version
+          properties:
+            data:
+              type: string
+              description: Apple Pay payment data
+              example: CM8i9PNK4yXtKO3xmOn6uyYOWmQ+iX9/Oc0EWHJZnPZ/IAEe2UYNCfely3dgq3veEygmQcl0s8lvMeCIZAbbBvbZWPKng9lfUwP2u3IUOFfFyI4beE9znpQ/e0nyQiVh8NFyZun8o0/YZfdFhaBy8bunveULZkWODZy3vg1LLTk0wSRfzbiFav/krgeMvztl8U85Fefl1VJVoJbW/jtShwDkusHizw/p/hkLiOFcCYSz7h9culZQMTWfqsxIfTuY3mOl+NhjAHPP+UFv4wefXrQL9MKO2cI6ttXOp5k6M6mFV/Qe0fbmJ6GnDWDMSiikW+3eL0yi0IApAKmmVgPS+uk42dyhrnSPhB6A7EJBmhEEb3ErL1I69Jq9REjDHp+VoZR0fAbDtpbjKKMo
+            header:
+              type: object
+              required:
+                - ephemeralPublicKey
+                - publicKeyHash
+                - transactionId
+              properties:
+                ephemeralPublicKey:
+                  type: string
+                  description: Ephemeral public key
+                  example: MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAELAfDie0Ie1TxCcrFt69BzcQ52+F+Fhm5mDw6pMR54AzoFMgdGPRbqoLtFpoSe0FI/m0cqRMOVM2W4Bz9jVZZHA==
+                publicKeyHash:
+                  type: string
+                  description: Public key hash
+                  example: LjAAyv6vb6jOEkjfG7L1a5OR2uCTHIkB61DaYdEWD+w=
+                transactionId:
+                  type: string
+                  description: Transaction ID
+                  example: 0c4352c073ad460044517596dbbf8fe503a837138c8c2de18fddb37ca3ec5295
+            signature:
+              type: string
+              description: Signature
+              example: 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
+            version:
+              type: string
+              description: Apple Pay version
+              example: EC_v1
+    
+    ChargeResponse:
+      type: object
+      required:
+        - success
+        - transaction_id
+        - charge_id
+        - status
+        - payment_url
+      properties:
+        success:
+          type: boolean
+          example: true
+          description: Whether the request was successful
+        transaction_id:
+          type: string
+          example: txn_1234567890abcdef
+          description: Unique transaction ID generated by our system
+        charge_id:
+          type: string
+          example: chg_1234567890abcdef
+          description: Charge ID returned by Tap Payments
+        status:
+          type: string
+          example: pending
+          description: Transaction status
+        payment_url:
+          type: string
+          example: https://checkout.tap.company/v2/checkout/12345
+          description: URL to redirect the user to complete the payment if needed
+    
+    WebhookRequest:
+      type: object
+      required:
+        - id
+        - event
+        - data
+      properties:
+        id:
+          type: string
+          example: evt_1234567890abcdef
+          description: Event ID
+        event:
+          type: string
+          example: charge.succeeded
+          description: Event type
+        data:
+          type: object
+          description: Event data
+          properties:
+            id:
+              type: string
+              example: chg_1234567890abcdef
+              description: Charge ID
+            amount:
+              type: number
+              format: float
+              example: 10.500
+              description: Payment amount
+            currency:
+              type: string
+              example: KWD
+              description: Payment currency
+            status:
+              type: string
+              example: CAPTURED
+              description: Charge status
+            reference:
+              type: object
+              properties:
+                transaction:
+                  type: string
+                  example: txn_1234567890abcdef
+                  description: Transaction reference
+                order:
+                  type: string
+                  example: order_12345
+                  description: Order reference
+            customer:
+              type: object
+              properties:
+                id:
+                  type: string
+                  example: cus_1234567890abcdef
+                  description: Customer ID
+            card:
+              type: object
+              properties:
+                brand:
+                  type: string
+                  example: VISA
+                  description: Card brand
+                last_four:
+                  type: string
+                  example: "1234"
+                  description: Last four digits of the card
+            response:
+              type: object
+              properties:
+                code:
+                  type: string
+                  example: 000
+                  description: Response code
+                message:
+                  type: string
+                  example: Captured
+                  description: Response message
+    
+    WebhookResponse:
+      type: object
+      required:
+        - status
+      properties:
+        status:
+          type: string
+          example: received
+          description: Status of the webhook processing
+        message:
+          type: string
+          example: Webhook processed
+          description: Additional information about the webhook processing
+    
+    ErrorResponse:
+      type: object
+      required:
+        - success
+        - message
+      properties:
+        success:
+          type: boolean
+          example: false
+          description: Whether the request was successful
+        message:
+          type: string
+          example: An error occurred while processing the payment
+          description: Error message
+        error:
+          type: string
+          example: Invalid token data
+          description: Detailed error information
+    
+    ValidationErrorResponse:
+      type: object
+      required:
+        - success
+        - message
+        - errors
+      properties:
+        success:
+          type: boolean
+          example: false
+          description: Whether the request was successful
+        message:
+          type: string
+          example: Validation failed
+          description: Error message
+        errors:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              type: string
+          example:
+            amount: ["The amount field is required.", "The amount must be at least 0.1."]
+            token_data: ["The token data field is required."]
+          description: Validation errors

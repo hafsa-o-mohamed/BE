@@ -18,23 +18,24 @@ class TapPaymentTransaction extends Model
         'transaction_id',
         'charge_id',
         'token_id',
-        'payment_agreement_id',
         'amount',
         'currency',
-        'status',
+        'description',
+        'reference_id',
+        'customer_name',
+        'customer_email',
+        'customer_phone',
         'payment_method',
-        'payment_type',
         'card_brand',
         'card_last_four',
-        'card_first_six',
-        'user_id',
-        'request_data',
-        'response_data',
+        'status',
+        'request_payload',
+        'response_payload',
+        'webhook_payload',
+        'error_code',
         'error_message',
-        'idempotency_key',
         'ip_address',
-        'user_agent',
-        'is_live',
+        'user_id',
     ];
 
     /**
@@ -43,10 +44,10 @@ class TapPaymentTransaction extends Model
      * @var array<string, string>
      */
     protected $casts = [
+        'request_payload' => 'array',
+        'response_payload' => 'array',
+        'webhook_payload' => 'array',
         'amount' => 'decimal:3',
-        'request_data' => 'array',
-        'response_data' => 'array',
-        'is_live' => 'boolean',
     ];
 
     /**

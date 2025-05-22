@@ -31,4 +31,12 @@ return [
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
 
+    'tap' => [
+        'secret_key' => env('TAP_SECRET_KEY'),
+        'public_key' => env('TAP_PUBLIC_KEY'),
+        'sandbox' => env('TAP_SANDBOX', true),
+        'webhook_url' => env('TAP_WEBHOOK_URL'),
+        'redirect_url' => env('TAP_REDIRECT_URL'),
+    ],
+
 ];

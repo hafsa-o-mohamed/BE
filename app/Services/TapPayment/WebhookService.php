@@ -9,12 +9,13 @@ use Illuminate\Support\Facades\Log;
 /**
  * Service for handling Tap Payments webhooks
  * 
- * @source https://developers.tap.company/docs/webhooks
+ * This service processes webhook notifications from Tap Payments
+ * Source: https://developers.tap.company/docs/webhooks
  */
 class WebhookService extends TapPaymentService
 {
     /**
-     * Process a webhook from Tap Payments
+     * Process webhook from Tap Payments
      * 
      * @param Request $request
      * @return array
@@ -25,26 +26,29 @@ class WebhookService extends TapPaymentService
         $payload = $request->all();
         
         // Verify webhook signature if available
-        $isVerified = $this->verifyWebhookSignature($request);
+        if ($request->header('Tap-Signature')) {
+            $this->verifySignature($request);
+        }
         
         // Backup webhook data to file
         $this->backupToFile('webhook_received', [
             'payload' => $payload,
             'headers' => $request->headers->all(),
-            'is_verified' => $isVerified,
             'timestamp' => now()->toIso8601String()
         ]);
-        
-        // Log webhook receipt
-        Log::info('Tap Payment webhook received', [
-            'event' => $payload['event'] ?? 'unknown',
-            'is_verified' => $isVerified,
-        ]);
-        
+
         try {
             // Process webhook based on event type
             $eventType = $payload['event'] ?? 'unknown';
+            $eventId = $payload['id'] ?? null;
             
+            // Log webhook receipt
+            Log::info('Tap Payment webhook received', [
+                'event_type' => $eventType,
+                'event_id' => $eventId
+            ]);
+            
+            // Process different event types
             switch ($eventType) {
                 case 'charge.succeeded':
                     return $this->handleSuccessfulCharge($payload);
@@ -52,22 +56,16 @@ class WebhookService extends TapPaymentService
                 case 'charge.failed':
                     return $this->handleFailedCharge($payload);
                     
-                case 'token.created':
-                    return $this->handleTokenCreated($payload);
-                    
-                case 'token.updated':
-                    return $this->handleTokenUpdated($payload);
-                    
                 default:
                     // Log unknown event type
                     Log::info('Tap Payment webhook received with unknown event type', [
                         'event_type' => $eventType,
+                        'payload' => $payload
                     ]);
                     
                     return [
-                        'success' => true,
-                        'message' => 'Webhook received but event type not handled',
-                        'event_type' => $eventType,
+                        'status' => 'received',
+                        'message' => 'Unhandled event type: ' . $eventType
                     ];
             }
         } catch (\Exception $e) {
@@ -75,43 +73,41 @@ class WebhookService extends TapPaymentService
             Log::error('Error processing Tap Payment webhook', [
                 'message' => $e->getMessage(),
                 'trace' => $e->getTraceAsString(),
-                'event' => $payload['event'] ?? 'unknown',
+                'payload' => $payload
             ]);
             
             return [
-                'success' => false,
-                'message' => 'Error processing webhook',
-                'error' => $e->getMessage(),
+                'status' => 'error',
+                'message' => 'Error processing webhook: ' . $e->getMessage()
             ];
         }
     }
-    
+
     /**
-     * Verify the webhook signature
+     * Verify webhook signature
      * 
      * @param Request $request
      * @return bool
+     * @throws \Exception If signature verification fails
      */
-    protected function verifyWebhookSignature(Request $request)
+    protected function verifySignature(Request $request)
     {
-        // Check if signature is present
+        // This is a placeholder for signature verification
+        // Tap Payments documentation doesn't provide clear details on signature verification
+        // Implement this when Tap provides more information
+        
         $signature = $request->header('Tap-Signature');
         
-        if (!$signature) {
-            return false;
-        }
-        
-        // TODO: Implement signature verification when Tap provides documentation
-        // For now, we'll just log that we received a signature
+        // Log the signature for now
         Log::info('Tap Payment webhook signature received', [
-            'signature' => $signature,
+            'signature' => $signature
         ]);
         
         return true;
     }
-    
+
     /**
-     * Handle a successful charge webhook
+     * Handle successful charge
      * 
      * @param array $payload
      * @return array
@@ -147,51 +143,51 @@ class WebhookService extends TapPaymentService
             'timestamp' => now()->toIso8601String()
         ]);
         
-        // Update transaction record if we can find it
-        if ($transactionId) {
-            $transaction = $this->findTransaction($transactionId);
+        // Update transaction in database
+        if ($chargeId) {
+            $transaction = $this->findTransactionByChargeId($chargeId);
+            
+            if (!$transaction && $transactionId) {
+                $transaction = $this->findTransaction($transactionId);
+            }
             
             if ($transaction) {
+                // Extract card information if available
+                $cardInfo = $payload['data']['card'] ?? null;
+                $cardBrand = $cardInfo['brand'] ?? $transaction->card_brand;
+                $cardLastFour = $cardInfo['last_four'] ?? $transaction->card_last_four;
+                
                 $transaction->update([
                     'charge_id' => $chargeId,
-                    'status' => 'captured',
-                    'response_data' => $payload['data'],
+                    'status' => 'successful',
+                    'card_brand' => $cardBrand,
+                    'card_last_four' => $cardLastFour,
+                    'webhook_payload' => $payload
                 ]);
-            } else {
-                // If we can't find the transaction by our ID, try by charge ID
-                $transaction = TapPaymentTransaction::where('charge_id', $chargeId)->first();
                 
-                if ($transaction) {
-                    $transaction->update([
-                        'status' => 'captured',
-                        'response_data' => $payload['data'],
-                    ]);
-                } else {
-                    // Create a new transaction record if we can't find an existing one
-                    $this->createTransactionRecord([
-                        'transaction_id' => $transactionId ?? 'webhook_' . Str::random(8),
-                        'charge_id' => $chargeId,
-                        'amount' => $amount,
-                        'currency' => $currency,
-                        'status' => 'captured',
-                        'response_data' => $payload['data'],
-                    ]);
-                }
+                // TODO: Trigger any necessary business logic (e.g., update order status, send confirmation email)
+            } else {
+                // Create a new transaction record if it doesn't exist
+                $this->createTransaction([
+                    'transaction_id' => $transactionId ?? $this->generateTransactionId(),
+                    'charge_id' => $chargeId,
+                    'amount' => $amount,
+                    'currency' => $currency,
+                    'status' => 'successful',
+                    'webhook_payload' => $payload
+                ]);
             }
         }
         
-        // TODO: Trigger any business logic for successful payments
-        // For example, update order status, send confirmation email, etc.
-        
         return [
-            'success' => true,
-            'message' => 'Successful charge webhook processed',
-            'charge_id' => $chargeId,
+            'status' => 'success',
+            'message' => 'Charge succeeded webhook processed',
+            'charge_id' => $chargeId
         ];
     }
-    
+
     /**
-     * Handle a failed charge webhook
+     * Handle failed charge
      * 
      * @param array $payload
      * @return array
@@ -206,6 +202,7 @@ class WebhookService extends TapPaymentService
         $transactionId = $payload['data']['reference']['transaction'] ?? null;
         $orderId = $payload['data']['reference']['order'] ?? null;
         $failureReason = $payload['data']['response']['message'] ?? 'Unknown reason';
+        $failureCode = $payload['data']['response']['code'] ?? 'unknown';
         
         // Log failed payment
         Log::error('Tap Payment failed', [
@@ -214,7 +211,8 @@ class WebhookService extends TapPaymentService
             'currency' => $currency,
             'transaction_id' => $transactionId,
             'order_id' => $orderId,
-            'failure_reason' => $failureReason
+            'failure_reason' => $failureReason,
+            'failure_code' => $failureCode
         ]);
         
         // Backup failed charge data
@@ -226,152 +224,48 @@ class WebhookService extends TapPaymentService
             'transaction_id' => $transactionId,
             'order_id' => $orderId,
             'failure_reason' => $failureReason,
+            'failure_code' => $failureCode,
             'payload' => $payload,
             'timestamp' => now()->toIso8601String()
         ]);
         
-        // Update transaction record if we can find it
-        if ($transactionId) {
-            $transaction = $this->findTransaction($transactionId);
+        // Update transaction in database
+        if ($chargeId) {
+            $transaction = $this->findTransactionByChargeId($chargeId);
+            
+            if (!$transaction && $transactionId) {
+                $transaction = $this->findTransaction($transactionId);
+            }
             
             if ($transaction) {
                 $transaction->update([
                     'charge_id' => $chargeId,
                     'status' => 'failed',
+                    'error_code' => $failureCode,
                     'error_message' => $failureReason,
-                    'response_data' => $payload['data'],
+                    'webhook_payload' => $payload
                 ]);
-            } else {
-                // If we can't find the transaction by our ID, try by charge ID
-                $transaction = TapPaymentTransaction::where('charge_id', $chargeId)->first();
                 
-                if ($transaction) {
-                    $transaction->update([
-                        'status' => 'failed',
-                        'error_message' => $failureReason,
-                        'response_data' => $payload['data'],
-                    ]);
-                } else {
-                    // Create a new transaction record if we can't find an existing one
-                    $this->createTransactionRecord([
-                        'transaction_id' => $transactionId ?? 'webhook_' . Str::random(8),
-                        'charge_id' => $chargeId,
-                        'amount' => $amount,
-                        'currency' => $currency,
-                        'status' => 'failed',
-                        'error_message' => $failureReason,
-                        'response_data' => $payload['data'],
-                    ]);
-                }
+                // TODO: Trigger any necessary business logic (e.g., notify customer, retry payment)
+            } else {
+                // Create a new transaction record if it doesn't exist
+                $this->createTransaction([
+                    'transaction_id' => $transactionId ?? $this->generateTransactionId(),
+                    'charge_id' => $chargeId,
+                    'amount' => $amount,
+                    'currency' => $currency,
+                    'status' => 'failed',
+                    'error_code' => $failureCode,
+                    'error_message' => $failureReason,
+                    'webhook_payload' => $payload
+                ]);
             }
         }
         
-        // TODO: Trigger any business logic for failed payments
-        // For example, notify customer, retry payment, etc.
-        
         return [
-            'success' => true,
-            'message' => 'Failed charge webhook processed',
-            'charge_id' => $chargeId,
-        ];
-    }
-    
-    /**
-     * Handle a token created webhook
-     * 
-     * @param array $payload
-     * @return array
-     */
-    protected function handleTokenCreated($payload)
-    {
-        // Extract token data
-        $tokenId = $payload['data']['id'] ?? null;
-        $tokenType = $payload['data']['type'] ?? null;
-        $cardInfo = $payload['data']['card'] ?? null;
-        
-        // Log token creation
-        Log::info('Tap Payment token created', [
-            'token_id' => $tokenId,
-            'token_type' => $tokenType,
-        ]);
-        
-        // Backup token data
-        $this->backupToFile('token_created', [
-            'token_id' => $tokenId,
-            'token_type' => $tokenType,
-            'card_info' => $cardInfo,
-            'payload' => $payload,
-            'timestamp' => now()->toIso8601String()
-        ]);
-        
-        // Find transaction by token ID
-        $transaction = TapPaymentTransaction::where('token_id', $tokenId)->first();
-        
-        if ($transaction) {
-            // Update transaction with token details
-            $transaction->update([
-                'status' => 'token_created',
-                'payment_method' => $tokenType,
-                'payment_type' => $cardInfo['funding'] ?? null,
-                'card_brand' => $cardInfo['brand'] ?? null,
-                'card_last_four' => $cardInfo['last_four'] ?? null,
-                'card_first_six' => $cardInfo['first_six'] ?? null,
-                'response_data' => $payload['data'],
-            ]);
-        }
-        
-        return [
-            'success' => true,
-            'message' => 'Token created webhook processed',
-            'token_id' => $tokenId,
-        ];
-    }
-    
-    /**
-     * Handle a token updated webhook
-     * 
-     * @param array $payload
-     * @return array
-     */
-    protected function handleTokenUpdated($payload)
-    {
-        // Extract token data
-        $tokenId = $payload['data']['id'] ?? null;
-        $tokenType = $payload['data']['type'] ?? null;
-        $cardInfo = $payload['data']['card'] ?? null;
-        $used = $payload['data']['used'] ?? false;
-        
-        // Log token update
-        Log::info('Tap Payment token updated', [
-            'token_id' => $tokenId,
-            'token_type' => $tokenType,
-            'used' => $used,
-        ]);
-        
-        // Backup token data
-        $this->backupToFile('token_updated', [
-            'token_id' => $tokenId,
-            'token_type' => $tokenType,
-            'card_info' => $cardInfo,
-            'used' => $used,
-            'payload' => $payload,
-            'timestamp' => now()->toIso8601String()
-        ]);
-        
-        // Find transaction by token ID
-        $transaction = TapPaymentTransaction::where('token_id', $tokenId)->first();
-        
-        if ($transaction) {
-            // Update transaction with token details
-            $transaction->update([
-                'response_data' => $payload['data'],
-            ]);
-        }
-        
-        return [
-            'success' => true,
-            'message' => 'Token updated webhook processed',
-            'token_id' => $tokenId,
+            'status' => 'success',
+            'message' => 'Charge failed webhook processed',
+            'charge_id' => $chargeId
         ];
     }
 }
