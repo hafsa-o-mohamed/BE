@@ -18,9 +18,17 @@ Route::post('/webhook', [TapPaymentController::class, 'webhook']);
 
 // Protected routes
 Route::middleware('auth:sanctum')->group(function () {
-    // Create a new charge
+    // Regular payment endpoints
     Route::post('/charges', [TapPaymentController::class, 'createCharge']);
-    
-    // Get charge details
     Route::get('/charges/{chargeId}', [TapPaymentController::class, 'getCharge']);
+    
+    // Apple Pay endpoints
+    Route::post('/apple-pay/token', [TapPaymentController::class, 'processApplePayToken']);
+    
+    // Payment Agreement endpoints
+    Route::post('/agreements', [TapPaymentController::class, 'createPaymentAgreement']);
+    Route::post('/merchant-charges', [TapPaymentController::class, 'createMerchantInitiatedCharge']);
+    
+    // Transaction history
+    Route::get('/transactions', [TapPaymentController::class, 'getTransactionHistory']);
 });
