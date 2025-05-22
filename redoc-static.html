@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf8" />
+  <title>Tap Payments API</title>
+  <!-- needed for adaptive design -->
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body {
+      padding: 0;
+      margin: 0;
+    }
+  </style>
+  <script src="https://cdn.redocly.com/redoc/v2.5.0/bundles/redoc.standalone.js"></script><style data-styled="true" data-styled-version="6.1.18">.iRoSfe{width:calc(100% - 40%);padding:0 40px;}/*!sc*/
+@media print,screen and (max-width: 75rem){.iRoSfe{width:100%;padding:40px 40px;}}/*!sc*/
+.ciCSbi{width:calc(100% - 40%);padding:0 40px;}/*!sc*/
+@media print,screen and (max-width: 75rem){.ciCSbi{width:100%;padding:0px 40px;}}/*!sc*/
+data-styled.g4[id="sc-gwsNht"]{content:"iRoSfe,ciCSbi,"}/*!sc*/
+.kDuBQd{padding:40px 0;}/*!sc*/
+.kDuBQd:last-child{min-height:calc(100vh + 1px);}/*!sc*/
+.kDuBQd>.kDuBQd:last-child{min-height:initial;}/*!sc*/
+@media print,screen and (max-width: 75rem){.kDuBQd{padding:0;}}/*!sc*/
+.dRVblm{padding:40px 0;position:relative;}/*!sc*/
+.dRVblm:last-child{min-height:calc(100vh + 1px);}/*!sc*/
+.dRVblm>.dRVblm:last-child{min-height:initial;}/*!sc*/
+@media print,screen and (max-width: 75rem){.dRVblm{padding:0;}}/*!sc*/
+.dRVblm:not(:last-of-type):after{position:absolute;bottom:0;width:100%;display:block;content:'';border-bottom:1px solid rgba(0, 0, 0, 0.2);}/*!sc*/
+data-styled.g5[id="sc-dYOLZc"]{content:"kDuBQd,dRVblm,"}/*!sc*/
+.kCcXaS{width:40%;color:#ffffff;background-color:#263238;padding:0 40px;}/*!sc*/
+@media print,screen and (max-width: 75rem){.kCcXaS{width:100%;padding:40px 40px;}}/*!sc*/
+data-styled.g6[id="sc-jMpmlX"]{content:"kCcXaS,"}/*!sc*/
+.jpPJrn{background-color:#263238;}/*!sc*/
+data-styled.g7[id="sc-hoLldG"]{content:"jpPJrn,"}/*!sc*/
+.tMeMv{display:flex;width:100%;padding:0;}/*!sc*/
+@media print,screen and (max-width: 75rem){.tMeMv{flex-direction:column;}}/*!sc*/
+data-styled.g8[id="sc-jZhnRx"]{content:"tMeMv,"}/*!sc*/
+.dKykVD{font-family:Montserrat,sans-serif;font-weight:400;font-size:1.85714em;line-height:1.6em;color:#333333;}/*!sc*/
+data-styled.g9[id="sc-hBDmJg"]{content:"dKykVD,"}/*!sc*/
+.jkwlQD{font-family:Montserrat,sans-serif;font-weight:400;font-size:1.57143em;line-height:1.6em;color:#333333;margin:0 0 20px;}/*!sc*/
+data-styled.g10[id="sc-kThouk"]{content:"jkwlQD,"}/*!sc*/
+.fdkIVZ{color:#ffffff;}/*!sc*/
+data-styled.g12[id="sc-llIIlC"]{content:"fdkIVZ,"}/*!sc*/
+.eUkINt{border-bottom:1px solid rgba(38, 50, 56, 0.3);margin:1em 0 1em 0;color:rgba(38, 50, 56, 0.5);font-weight:normal;text-transform:uppercase;font-size:0.929em;line-height:20px;}/*!sc*/
+data-styled.g13[id="sc-elFkmj"]{content:"eUkINt,"}/*!sc*/
+.jOWzfS{cursor:pointer;margin-left:-20px;padding:0;line-height:1;width:20px;display:inline-block;outline:0;}/*!sc*/
+.jOWzfS:before{content:'';width:15px;height:15px;background-size:contain;background-image:url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZlcnNpb249IjEuMSIgeD0iMCIgeT0iMCIgd2lkdGg9IjUxMiIgaGVpZ2h0PSI1MTIiIHZpZXdCb3g9IjAgMCA1MTIgNTEyIiBlbmFibGUtYmFja2dyb3VuZD0ibmV3IDAgMCA1MTIgNTEyIiB4bWw6c3BhY2U9InByZXNlcnZlIj48cGF0aCBmaWxsPSIjMDEwMTAxIiBkPSJNNDU5LjcgMjMzLjRsLTkwLjUgOTAuNWMtNTAgNTAtMTMxIDUwLTE4MSAwIC03LjktNy44LTE0LTE2LjctMTkuNC0yNS44bDQyLjEtNDIuMWMyLTIgNC41LTMuMiA2LjgtNC41IDIuOSA5LjkgOCAxOS4zIDE1LjggMjcuMiAyNSAyNSA2NS42IDI0LjkgOTAuNSAwbDkwLjUtOTAuNWMyNS0yNSAyNS02NS42IDAtOTAuNSAtMjQuOS0yNS02NS41LTI1LTkwLjUgMGwtMzIuMiAzMi4yYy0yNi4xLTEwLjItNTQuMi0xMi45LTgxLjYtOC45bDY4LjYtNjguNmM1MC01MCAxMzEtNTAgMTgxIDBDNTA5LjYgMTAyLjMgNTA5LjYgMTgzLjQgNDU5LjcgMjMzLjR6TTIyMC4zIDM4Mi4ybC0zMi4yIDMyLjJjLTI1IDI0LjktNjUuNiAyNC45LTkwLjUgMCAtMjUtMjUtMjUtNjUuNiAwLTkwLjVsOTAuNS05MC41YzI1LTI1IDY1LjUtMjUgOTAuNSAwIDcuOCA3LjggMTIuOSAxNy4yIDE1LjggMjcuMSAyLjQtMS40IDQuOC0yLjUgNi44LTQuNWw0Mi4xLTQyYy01LjQtOS4yLTExLjYtMTgtMTkuNC0yNS44IC01MC01MC0xMzEtNTAtMTgxIDBsLTkwLjUgOTAuNWMtNTAgNTAtNTAgMTMxIDAgMTgxIDUwIDUwIDEzMSA1MCAxODEgMGw2OC42LTY4LjZDMjc0LjYgMzk1LjEgMjQ2LjQgMzkyLjMgMjIwLjMgMzgyLjJ6Ii8+PC9zdmc+Cg==');opacity:0.5;visibility:hidden;display:inline-block;vertical-align:middle;}/*!sc*/
+h1:hover>.jOWzfS::before,h2:hover>.jOWzfS::before,.jOWzfS:hover::before{visibility:visible;}/*!sc*/
+data-styled.g14[id="sc-kieALA"]{content:"jOWzfS,"}/*!sc*/
+.bnalXq{height:18px;width:18px;min-width:18px;vertical-align:middle;float:right;transition:transform 0.2s ease-out;transform:rotateZ(-90deg);}/*!sc*/
+.gsIrbT{height:1.3em;width:1.3em;min-width:1.3em;vertical-align:middle;transition:transform 0.2s ease-out;transform:rotateZ(-90deg);}/*!sc*/
+.eVNtOe{height:18px;width:18px;min-width:18px;vertical-align:middle;transition:transform 0.2s ease-out;transform:rotateZ(-90deg);}/*!sc*/
+.dpIKEE{height:1.5em;width:1.5em;min-width:1.5em;vertical-align:middle;float:left;transition:transform 0.2s ease-out;transform:rotateZ(-90deg);}/*!sc*/
+.dpIKEE polygon{fill:#1d8127;}/*!sc*/
+.jsRtRU{height:1.5em;width:1.5em;min-width:1.5em;vertical-align:middle;float:left;transition:transform 0.2s ease-out;transform:rotateZ(-90deg);}/*!sc*/
+.jsRtRU polygon{fill:#d41f1c;}/*!sc*/
+.NOyYc{height:20px;width:20px;min-width:20px;vertical-align:middle;float:right;transition:transform 0.2s ease-out;transform:rotateZ(0);}/*!sc*/
+.NOyYc polygon{fill:white;}/*!sc*/
+data-styled.g15[id="sc-dibcMh"]{content:"bnalXq,gsIrbT,eVNtOe,dpIKEE,jsRtRU,NOyYc,"}/*!sc*/
+.cDFxGr{border-left:1px solid #7c7cbb;box-sizing:border-box;position:relative;padding:10px 10px 10px 0;}/*!sc*/
+@media screen and (max-width: 50rem){.cDFxGr{display:block;overflow:hidden;}}/*!sc*/
+tr:first-of-type>.cDFxGr,tr.last>.cDFxGr{border-left-width:0;background-position:top left;background-repeat:no-repeat;background-size:1px 100%;}/*!sc*/
+tr:first-of-type>.cDFxGr{background-image:linear-gradient(
+      to bottom,
+      transparent 0%,
+      transparent 22px,
+      #7c7cbb 22px,
+      #7c7cbb 100%
+    );}/*!sc*/
+tr.last>.cDFxGr{background-image:linear-gradient(
+      to bottom,
+      #7c7cbb 0%,
+      #7c7cbb 22px,
+      transparent 22px,
+      transparent 100%
+    );}/*!sc*/
+tr.last+tr>.cDFxGr{border-left-color:transparent;}/*!sc*/
+tr.last:first-child>.cDFxGr{background:none;border-left-color:transparent;}/*!sc*/
+data-styled.g18[id="sc-kHNKno"]{content:"cDFxGr,"}/*!sc*/
+.kNAbAx{vertical-align:top;line-height:20px;white-space:nowrap;font-size:13px;font-family:Courier,monospace;}/*!sc*/
+.kNAbAx.deprecated{text-decoration:line-through;color:#707070;}/*!sc*/
+data-styled.g20[id="sc-frmfij"]{content:"kNAbAx,"}/*!sc*/
+.dzPbxx{border-bottom:1px solid #9fb4be;padding:10px 0;width:75%;box-sizing:border-box;}/*!sc*/
+tr.expanded .dzPbxx{border-bottom:none;}/*!sc*/
+@media screen and (max-width: 50rem){.dzPbxx{padding:0 20px;border-bottom:none;border-left:1px solid #7c7cbb;}tr.last>.dzPbxx{border-left:none;}}/*!sc*/
+data-styled.g21[id="sc-groBii"]{content:"dzPbxx,"}/*!sc*/
+.lhCIDE{color:#7c7cbb;font-family:Courier,monospace;margin-right:10px;}/*!sc*/
+.lhCIDE::before{content:'';display:inline-block;vertical-align:middle;width:10px;height:1px;background:#7c7cbb;}/*!sc*/
+.lhCIDE::after{content:'';display:inline-block;vertical-align:middle;width:1px;background:#7c7cbb;height:7px;}/*!sc*/
+data-styled.g22[id="sc-hLyRwt"]{content:"lhCIDE,"}/*!sc*/
+.cGiuNU{border-collapse:separate;border-radius:3px;font-size:14px;border-spacing:0;width:100%;}/*!sc*/
+.cGiuNU >tr{vertical-align:middle;}/*!sc*/
+@media screen and (max-width: 50rem){.cGiuNU{display:block;}.cGiuNU >tr,.cGiuNU >tbody>tr{display:block;}}/*!sc*/
+@media screen and (max-width: 50rem) and (-ms-high-contrast:none){.cGiuNU td{float:left;width:100%;}}/*!sc*/
+.cGiuNU .sc-iLBnws,.cGiuNU .sc-iLBnws .sc-iLBnws .sc-iLBnws,.cGiuNU .sc-iLBnws .sc-iLBnws .sc-iLBnws .sc-iLBnws .sc-iLBnws{margin:1em;margin-right:0;background:#fafafa;}/*!sc*/
+.cGiuNU .sc-iLBnws .sc-iLBnws,.cGiuNU .sc-iLBnws .sc-iLBnws .sc-iLBnws .sc-iLBnws,.cGiuNU .sc-iLBnws .sc-iLBnws .sc-iLBnws .sc-iLBnws .sc-iLBnws .sc-iLBnws{background:#ffffff;}/*!sc*/
+data-styled.g24[id="sc-eGjrzz"]{content:"cGiuNU,"}/*!sc*/
+.dFpYBv >ul{list-style:none;padding:0;margin:0;margin:0 -5px;}/*!sc*/
+.dFpYBv >ul >li{padding:5px 10px;display:inline-block;background-color:#11171a;border-bottom:1px solid rgba(0, 0, 0, 0.5);cursor:pointer;text-align:center;outline:none;color:#ccc;margin:0 5px 5px 5px;border:1px solid #07090b;border-radius:5px;min-width:60px;font-size:0.9em;font-weight:bold;}/*!sc*/
+.dFpYBv >ul >li.react-tabs__tab--selected{color:#333333;background:#ffffff;}/*!sc*/
+.dFpYBv >ul >li.react-tabs__tab--selected:focus{outline:auto;}/*!sc*/
+.dFpYBv >ul >li:only-child{flex:none;min-width:100px;}/*!sc*/
+.dFpYBv >ul >li.tab-success{color:#1d8127;}/*!sc*/
+.dFpYBv >ul >li.tab-redirect{color:#ffa500;}/*!sc*/
+.dFpYBv >ul >li.tab-info{color:#87ceeb;}/*!sc*/
+.dFpYBv >ul >li.tab-error{color:#d41f1c;}/*!sc*/
+.dFpYBv >.react-tabs__tab-panel{background:#11171a;}/*!sc*/
+.dFpYBv >.react-tabs__tab-panel>div,.dFpYBv >.react-tabs__tab-panel>pre{padding:20px;margin:0;}/*!sc*/
+.dFpYBv >.react-tabs__tab-panel>div>pre{padding:0;}/*!sc*/
+data-styled.g30[id="sc-cTIdZS"]{content:"dFpYBv,"}/*!sc*/
+.kOqeZB code[class*='language-'],.kOqeZB pre[class*='language-']{text-shadow:0 -0.1em 0.2em black;text-align:left;white-space:pre;word-spacing:normal;word-break:normal;word-wrap:normal;line-height:1.5;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-hyphens:none;-moz-hyphens:none;-ms-hyphens:none;hyphens:none;}/*!sc*/
+@media print{.kOqeZB code[class*='language-'],.kOqeZB pre[class*='language-']{text-shadow:none;}}/*!sc*/
+.kOqeZB pre[class*='language-']{padding:1em;margin:0.5em 0;overflow:auto;}/*!sc*/
+.kOqeZB .token.comment,.kOqeZB .token.prolog,.kOqeZB .token.doctype,.kOqeZB .token.cdata{color:hsl(30, 20%, 50%);}/*!sc*/
+.kOqeZB .token.punctuation{opacity:0.7;}/*!sc*/
+.kOqeZB .namespace{opacity:0.7;}/*!sc*/
+.kOqeZB .token.property,.kOqeZB .token.tag,.kOqeZB .token.number,.kOqeZB .token.constant,.kOqeZB .token.symbol{color:#4a8bb3;}/*!sc*/
+.kOqeZB .token.boolean{color:#e64441;}/*!sc*/
+.kOqeZB .token.selector,.kOqeZB .token.attr-name,.kOqeZB .token.string,.kOqeZB .token.char,.kOqeZB .token.builtin,.kOqeZB .token.inserted{color:#a0fbaa;}/*!sc*/
+.kOqeZB .token.selector+a,.kOqeZB .token.attr-name+a,.kOqeZB .token.string+a,.kOqeZB .token.char+a,.kOqeZB .token.builtin+a,.kOqeZB .token.inserted+a,.kOqeZB .token.selector+a:visited,.kOqeZB .token.attr-name+a:visited,.kOqeZB .token.string+a:visited,.kOqeZB .token.char+a:visited,.kOqeZB .token.builtin+a:visited,.kOqeZB .token.inserted+a:visited{color:#4ed2ba;text-decoration:underline;}/*!sc*/
+.kOqeZB .token.property.string{color:white;}/*!sc*/
+.kOqeZB .token.operator,.kOqeZB .token.entity,.kOqeZB .token.url,.kOqeZB .token.variable{color:hsl(40, 90%, 60%);}/*!sc*/
+.kOqeZB .token.atrule,.kOqeZB .token.attr-value,.kOqeZB .token.keyword{color:hsl(350, 40%, 70%);}/*!sc*/
+.kOqeZB .token.regex,.kOqeZB .token.important{color:#e90;}/*!sc*/
+.kOqeZB .token.important,.kOqeZB .token.bold{font-weight:bold;}/*!sc*/
+.kOqeZB .token.italic{font-style:italic;}/*!sc*/
+.kOqeZB .token.entity{cursor:help;}/*!sc*/
+.kOqeZB .token.deleted{color:red;}/*!sc*/
+data-styled.g32[id="sc-faJlkc"]{content:"kOqeZB,"}/*!sc*/
+.itwxyW{opacity:0.7;transition:opacity 0.3s ease;text-align:right;}/*!sc*/
+.itwxyW:focus-within{opacity:1;}/*!sc*/
+.itwxyW >button{background-color:transparent;border:0;color:inherit;padding:2px 10px;font-family:Roboto,sans-serif;font-size:14px;line-height:1.5em;cursor:pointer;outline:0;}/*!sc*/
+.itwxyW >button :hover,.itwxyW >button :focus{background:rgba(255, 255, 255, 0.1);}/*!sc*/
+data-styled.g33[id="sc-VILhF"]{content:"itwxyW,"}/*!sc*/
+.dkdAtf{position:relative;}/*!sc*/
+data-styled.g37[id="sc-epGxBs"]{content:"dkdAtf,"}/*!sc*/
+.iFdOsg{margin-left:10px;text-transform:none;font-size:0.929em;color:black;}/*!sc*/
+data-styled.g41[id="sc-edaYAx"]{content:"iFdOsg,"}/*!sc*/
+.kEOvim{font-family:Roboto,sans-serif;font-weight:400;line-height:1.5em;}/*!sc*/
+.kEOvim p:last-child{margin-bottom:0;}/*!sc*/
+.kEOvim h1{font-family:Montserrat,sans-serif;font-weight:400;font-size:1.85714em;line-height:1.6em;color:#32329f;margin-top:0;}/*!sc*/
+.kEOvim h2{font-family:Montserrat,sans-serif;font-weight:400;font-size:1.57143em;line-height:1.6em;color:#333333;}/*!sc*/
+.kEOvim code{color:#e53935;background-color:rgba(38, 50, 56, 0.05);font-family:Courier,monospace;border-radius:2px;border:1px solid rgba(38, 50, 56, 0.1);padding:0 5px;font-size:13px;font-weight:400;word-break:break-word;}/*!sc*/
+.kEOvim pre{font-family:Courier,monospace;white-space:pre;background-color:#11171a;color:white;padding:20px;overflow-x:auto;line-height:normal;border-radius:0;border:1px solid rgba(38, 50, 56, 0.1);}/*!sc*/
+.kEOvim pre code{background-color:transparent;color:white;padding:0;}/*!sc*/
+.kEOvim pre code:before,.kEOvim pre code:after{content:none;}/*!sc*/
+.kEOvim blockquote{margin:0;margin-bottom:1em;padding:0 15px;color:#777;border-left:4px solid #ddd;}/*!sc*/
+.kEOvim img{max-width:100%;box-sizing:content-box;}/*!sc*/
+.kEOvim ul,.kEOvim ol{padding-left:2em;margin:0;margin-bottom:1em;}/*!sc*/
+.kEOvim ul ul,.kEOvim ol ul,.kEOvim ul ol,.kEOvim ol ol{margin-bottom:0;margin-top:0;}/*!sc*/
+.kEOvim table{display:block;width:100%;overflow:auto;word-break:normal;word-break:keep-all;border-collapse:collapse;border-spacing:0;margin-top:1.5em;margin-bottom:1.5em;}/*!sc*/
+.kEOvim table tr{background-color:#fff;border-top:1px solid #ccc;}/*!sc*/
+.kEOvim table tr:nth-child(2n){background-color:#fafafa;}/*!sc*/
+.kEOvim table th,.kEOvim table td{padding:6px 13px;border:1px solid #ddd;}/*!sc*/
+.kEOvim table th{text-align:left;font-weight:bold;}/*!sc*/
+.kEOvim .share-link{cursor:pointer;margin-left:-20px;padding:0;line-height:1;width:20px;display:inline-block;outline:0;}/*!sc*/
+.kEOvim .share-link:before{content:'';width:15px;height:15px;background-size:contain;background-image:url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZlcnNpb249IjEuMSIgeD0iMCIgeT0iMCIgd2lkdGg9IjUxMiIgaGVpZ2h0PSI1MTIiIHZpZXdCb3g9IjAgMCA1MTIgNTEyIiBlbmFibGUtYmFja2dyb3VuZD0ibmV3IDAgMCA1MTIgNTEyIiB4bWw6c3BhY2U9InByZXNlcnZlIj48cGF0aCBmaWxsPSIjMDEwMTAxIiBkPSJNNDU5LjcgMjMzLjRsLTkwLjUgOTAuNWMtNTAgNTAtMTMxIDUwLTE4MSAwIC03LjktNy44LTE0LTE2LjctMTkuNC0yNS44bDQyLjEtNDIuMWMyLTIgNC41LTMuMiA2LjgtNC41IDIuOSA5LjkgOCAxOS4zIDE1LjggMjcuMiAyNSAyNSA2NS42IDI0LjkgOTAuNSAwbDkwLjUtOTAuNWMyNS0yNSAyNS02NS42IDAtOTAuNSAtMjQuOS0yNS02NS41LTI1LTkwLjUgMGwtMzIuMiAzMi4yYy0yNi4xLTEwLjItNTQuMi0xMi45LTgxLjYtOC45bDY4LjYtNjguNmM1MC01MCAxMzEtNTAgMTgxIDBDNTA5LjYgMTAyLjMgNTA5LjYgMTgzLjQgNDU5LjcgMjMzLjR6TTIyMC4zIDM4Mi4ybC0zMi4yIDMyLjJjLTI1IDI0LjktNjUuNiAyNC45LTkwLjUgMCAtMjUtMjUtMjUtNjUuNiAwLTkwLjVsOTAuNS05MC41YzI1LTI1IDY1LjUtMjUgOTAuNSAwIDcuOCA3LjggMTIuOSAxNy4yIDE1LjggMjcuMSAyLjQtMS40IDQuOC0yLjUgNi44LTQuNWw0Mi4xLTQyYy01LjQtOS4yLTExLjYtMTgtMTkuNC0yNS44IC01MC01MC0xMzEtNTAtMTgxIDBsLTkwLjUgOTAuNWMtNTAgNTAtNTAgMTMxIDAgMTgxIDUwIDUwIDEzMSA1MCAxODEgMGw2OC42LTY4LjZDMjc0LjYgMzk1LjEgMjQ2LjQgMzkyLjMgMjIwLjMgMzgyLjJ6Ii8+PC9zdmc+Cg==');opacity:0.5;visibility:hidden;display:inline-block;vertical-align:middle;}/*!sc*/
+.kEOvim h1:hover>.share-link::before,.kEOvim h2:hover>.share-link::before,.kEOvim .share-link:hover::before{visibility:visible;}/*!sc*/
+.kEOvim a{text-decoration:auto;color:#32329f;}/*!sc*/
+.kEOvim a:visited{color:#32329f;}/*!sc*/
+.kEOvim a:hover{color:#6868cf;text-decoration:auto;}/*!sc*/
+.csbUjU{font-family:Roboto,sans-serif;font-weight:400;line-height:1.5em;}/*!sc*/
+.csbUjU p:last-child{margin-bottom:0;}/*!sc*/
+.csbUjU p:first-child{margin-top:0;}/*!sc*/
+.csbUjU p:last-child{margin-bottom:0;}/*!sc*/
+.csbUjU h1{font-family:Montserrat,sans-serif;font-weight:400;font-size:1.85714em;line-height:1.6em;color:#32329f;margin-top:0;}/*!sc*/
+.csbUjU h2{font-family:Montserrat,sans-serif;font-weight:400;font-size:1.57143em;line-height:1.6em;color:#333333;}/*!sc*/
+.csbUjU code{color:#e53935;background-color:rgba(38, 50, 56, 0.05);font-family:Courier,monospace;border-radius:2px;border:1px solid rgba(38, 50, 56, 0.1);padding:0 5px;font-size:13px;font-weight:400;word-break:break-word;}/*!sc*/
+.csbUjU pre{font-family:Courier,monospace;white-space:pre;background-color:#11171a;color:white;padding:20px;overflow-x:auto;line-height:normal;border-radius:0;border:1px solid rgba(38, 50, 56, 0.1);}/*!sc*/
+.csbUjU pre code{background-color:transparent;color:white;padding:0;}/*!sc*/
+.csbUjU pre code:before,.csbUjU pre code:after{content:none;}/*!sc*/
+.csbUjU blockquote{margin:0;margin-bottom:1em;padding:0 15px;color:#777;border-left:4px solid #ddd;}/*!sc*/
+.csbUjU img{max-width:100%;box-sizing:content-box;}/*!sc*/
+.csbUjU ul,.csbUjU ol{padding-left:2em;margin:0;margin-bottom:1em;}/*!sc*/
+.csbUjU ul ul,.csbUjU ol ul,.csbUjU ul ol,.csbUjU ol ol{margin-bottom:0;margin-top:0;}/*!sc*/
+.csbUjU table{display:block;width:100%;overflow:auto;word-break:normal;word-break:keep-all;border-collapse:collapse;border-spacing:0;margin-top:1.5em;margin-bottom:1.5em;}/*!sc*/
+.csbUjU table tr{background-color:#fff;border-top:1px solid #ccc;}/*!sc*/
+.csbUjU table tr:nth-child(2n){background-color:#fafafa;}/*!sc*/
+.csbUjU table th,.csbUjU table td{padding:6px 13px;border:1px solid #ddd;}/*!sc*/
+.csbUjU table th{text-align:left;font-weight:bold;}/*!sc*/
+.csbUjU .share-link{cursor:pointer;margin-left:-20px;padding:0;line-height:1;width:20px;display:inline-block;outline:0;}/*!sc*/
+.csbUjU .share-link:before{content:'';width:15px;height:15px;background-size:contain;background-image:url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZlcnNpb249IjEuMSIgeD0iMCIgeT0iMCIgd2lkdGg9IjUxMiIgaGVpZ2h0PSI1MTIiIHZpZXdCb3g9IjAgMCA1MTIgNTEyIiBlbmFibGUtYmFja2dyb3VuZD0ibmV3IDAgMCA1MTIgNTEyIiB4bWw6c3BhY2U9InByZXNlcnZlIj48cGF0aCBmaWxsPSIjMDEwMTAxIiBkPSJNNDU5LjcgMjMzLjRsLTkwLjUgOTAuNWMtNTAgNTAtMTMxIDUwLTE4MSAwIC03LjktNy44LTE0LTE2LjctMTkuNC0yNS44bDQyLjEtNDIuMWMyLTIgNC41LTMuMiA2LjgtNC41IDIuOSA5LjkgOCAxOS4zIDE1LjggMjcuMiAyNSAyNSA2NS42IDI0LjkgOTAuNSAwbDkwLjUtOTAuNWMyNS0yNSAyNS02NS42IDAtOTAuNSAtMjQuOS0yNS02NS41LTI1LTkwLjUgMGwtMzIuMiAzMi4yYy0yNi4xLTEwLjItNTQuMi0xMi45LTgxLjYtOC45bDY4LjYtNjguNmM1MC01MCAxMzEtNTAgMTgxIDBDNTA5LjYgMTAyLjMgNTA5LjYgMTgzLjQgNDU5LjcgMjMzLjR6TTIyMC4zIDM4Mi4ybC0zMi4yIDMyLjJjLTI1IDI0LjktNjUuNiAyNC45LTkwLjUgMCAtMjUtMjUtMjUtNjUuNiAwLTkwLjVsOTAuNS05MC41YzI1LTI1IDY1LjUtMjUgOTAuNSAwIDcuOCA3LjggMTIuOSAxNy4yIDE1LjggMjcuMSAyLjQtMS40IDQuOC0yLjUgNi44LTQuNWw0Mi4xLTQyYy01LjQtOS4yLTExLjYtMTgtMTkuNC0yNS44IC01MC01MC0xMzEtNTAtMTgxIDBsLTkwLjUgOTAuNWMtNTAgNTAtNTAgMTMxIDAgMTgxIDUwIDUwIDEzMSA1MCAxODEgMGw2OC42LTY4LjZDMjc0LjYgMzk1LjEgMjQ2LjQgMzkyLjMgMjIwLjMgMzgyLjJ6Ii8+PC9zdmc+Cg==');opacity:0.5;visibility:hidden;display:inline-block;vertical-align:middle;}/*!sc*/
+.csbUjU h1:hover>.share-link::before,.csbUjU h2:hover>.share-link::before,.csbUjU .share-link:hover::before{visibility:visible;}/*!sc*/
+.csbUjU a{text-decoration:auto;color:#32329f;}/*!sc*/
+.csbUjU a:visited{color:#32329f;}/*!sc*/
+.csbUjU a:hover{color:#6868cf;text-decoration:auto;}/*!sc*/
+.kkltVg{font-family:Roboto,sans-serif;font-weight:400;line-height:1.5em;}/*!sc*/
+.kkltVg p:last-child{margin-bottom:0;}/*!sc*/
+.kkltVg p:first-child{margin-top:0;}/*!sc*/
+.kkltVg p:last-child{margin-bottom:0;}/*!sc*/
+.kkltVg p{display:inline-block;}/*!sc*/
+.kkltVg h1{font-family:Montserrat,sans-serif;font-weight:400;font-size:1.85714em;line-height:1.6em;color:#32329f;margin-top:0;}/*!sc*/
+.kkltVg h2{font-family:Montserrat,sans-serif;font-weight:400;font-size:1.57143em;line-height:1.6em;color:#333333;}/*!sc*/
+.kkltVg code{color:#e53935;background-color:rgba(38, 50, 56, 0.05);font-family:Courier,monospace;border-radius:2px;border:1px solid rgba(38, 50, 56, 0.1);padding:0 5px;font-size:13px;font-weight:400;word-break:break-word;}/*!sc*/
+.kkltVg pre{font-family:Courier,monospace;white-space:pre;background-color:#11171a;color:white;padding:20px;overflow-x:auto;line-height:normal;border-radius:0;border:1px solid rgba(38, 50, 56, 0.1);}/*!sc*/
+.kkltVg pre code{background-color:transparent;color:white;padding:0;}/*!sc*/
+.kkltVg pre code:before,.kkltVg pre code:after{content:none;}/*!sc*/
+.kkltVg blockquote{margin:0;margin-bottom:1em;padding:0 15px;color:#777;border-left:4px solid #ddd;}/*!sc*/
+.kkltVg img{max-width:100%;box-sizing:content-box;}/*!sc*/
+.kkltVg ul,.kkltVg ol{padding-left:2em;margin:0;margin-bottom:1em;}/*!sc*/
+.kkltVg ul ul,.kkltVg ol ul,.kkltVg ul ol,.kkltVg ol ol{margin-bottom:0;margin-top:0;}/*!sc*/
+.kkltVg table{display:block;width:100%;overflow:auto;word-break:normal;word-break:keep-all;border-collapse:collapse;border-spacing:0;margin-top:1.5em;margin-bottom:1.5em;}/*!sc*/
+.kkltVg table tr{background-color:#fff;border-top:1px solid #ccc;}/*!sc*/
+.kkltVg table tr:nth-child(2n){background-color:#fafafa;}/*!sc*/
+.kkltVg table th,.kkltVg table td{padding:6px 13px;border:1px solid #ddd;}/*!sc*/
+.kkltVg table th{text-align:left;font-weight:bold;}/*!sc*/
+.kkltVg .share-link{cursor:pointer;margin-left:-20px;padding:0;line-height:1;width:20px;display:inline-block;outline:0;}/*!sc*/
+.kkltVg .share-link:before{content:'';width:15px;height:15px;background-size:contain;background-image:url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZlcnNpb249IjEuMSIgeD0iMCIgeT0iMCIgd2lkdGg9IjUxMiIgaGVpZ2h0PSI1MTIiIHZpZXdCb3g9IjAgMCA1MTIgNTEyIiBlbmFibGUtYmFja2dyb3VuZD0ibmV3IDAgMCA1MTIgNTEyIiB4bWw6c3BhY2U9InByZXNlcnZlIj48cGF0aCBmaWxsPSIjMDEwMTAxIiBkPSJNNDU5LjcgMjMzLjRsLTkwLjUgOTAuNWMtNTAgNTAtMTMxIDUwLTE4MSAwIC03LjktNy44LTE0LTE2LjctMTkuNC0yNS44bDQyLjEtNDIuMWMyLTIgNC41LTMuMiA2LjgtNC41IDIuOSA5LjkgOCAxOS4zIDE1LjggMjcuMiAyNSAyNSA2NS42IDI0LjkgOTAuNSAwbDkwLjUtOTAuNWMyNS0yNSAyNS02NS42IDAtOTAuNSAtMjQuOS0yNS02NS41LTI1LTkwLjUgMGwtMzIuMiAzMi4yYy0yNi4xLTEwLjItNTQuMi0xMi45LTgxLjYtOC45bDY4LjYtNjguNmM1MC01MCAxMzEtNTAgMTgxIDBDNTA5LjYgMTAyLjMgNTA5LjYgMTgzLjQgNDU5LjcgMjMzLjR6TTIyMC4zIDM4Mi4ybC0zMi4yIDMyLjJjLTI1IDI0LjktNjUuNiAyNC45LTkwLjUgMCAtMjUtMjUtMjUtNjUuNiAwLTkwLjVsOTAuNS05MC41YzI1LTI1IDY1LjUtMjUgOTAuNSAwIDcuOCA3LjggMTIuOSAxNy4yIDE1LjggMjcuMSAyLjQtMS40IDQuOC0yLjUgNi44LTQuNWw0Mi4xLTQyYy01LjQtOS4yLTExLjYtMTgtMTkuNC0yNS44IC01MC01MC0xMzEtNTAtMTgxIDBsLTkwLjUgOTAuNWMtNTAgNTAtNTAgMTMxIDAgMTgxIDUwIDUwIDEzMSA1MCAxODEgMGw2OC42LTY4LjZDMjc0LjYgMzk1LjEgMjQ2LjQgMzkyLjMgMjIwLjMgMzgyLjJ6Ii8+PC9zdmc+Cg==');opacity:0.5;visibility:hidden;display:inline-block;vertical-align:middle;}/*!sc*/
+.kkltVg h1:hover>.share-link::before,.kkltVg h2:hover>.share-link::before,.kkltVg .share-link:hover::before{visibility:visible;}/*!sc*/
+.kkltVg a{text-decoration:auto;color:#32329f;}/*!sc*/
+.kkltVg a:visited{color:#32329f;}/*!sc*/
+.kkltVg a:hover{color:#6868cf;text-decoration:auto;}/*!sc*/
+data-styled.g42[id="sc-fdduAw"]{content:"kEOvim,csbUjU,kkltVg,"}/*!sc*/
+.fbuMAW{display:inline;}/*!sc*/
+data-styled.g43[id="sc-eINXvP"]{content:"fbuMAW,"}/*!sc*/
+.indwFD{position:relative;}/*!sc*/
+data-styled.g44[id="sc-fIQtvO"]{content:"indwFD,"}/*!sc*/
+.iAOzgg:hover>.sc-VILhF{opacity:1;}/*!sc*/
+data-styled.g49[id="sc-dRHutB"]{content:"iAOzgg,"}/*!sc*/
+.eudsMA{font-family:Courier,monospace;font-size:13px;white-space:pre;contain:content;overflow-x:auto;}/*!sc*/
+.eudsMA .redoc-json code>.collapser{display:none;pointer-events:none;}/*!sc*/
+.eudsMA .callback-function{color:gray;}/*!sc*/
+.eudsMA .collapser:after{content:'-';cursor:pointer;}/*!sc*/
+.eudsMA .collapsed>.collapser:after{content:'+';cursor:pointer;}/*!sc*/
+.eudsMA .ellipsis:after{content:' … ';}/*!sc*/
+.eudsMA .collapsible{margin-left:2em;}/*!sc*/
+.eudsMA .hoverable{padding-top:1px;padding-bottom:1px;padding-left:2px;padding-right:2px;border-radius:2px;}/*!sc*/
+.eudsMA .hovered{background-color:rgba(235, 238, 249, 1);}/*!sc*/
+.eudsMA .collapser{background-color:transparent;border:0;color:#fff;font-family:Courier,monospace;font-size:13px;padding-right:6px;padding-left:6px;padding-top:0;padding-bottom:0;display:flex;align-items:center;justify-content:center;width:15px;height:15px;position:absolute;top:4px;left:-1.5em;cursor:default;user-select:none;-webkit-user-select:none;padding:2px;}/*!sc*/
+.eudsMA .collapser:focus{outline-color:#fff;outline-style:dotted;outline-width:1px;}/*!sc*/
+.eudsMA ul{list-style-type:none;padding:0px;margin:0px 0px 0px 26px;}/*!sc*/
+.eudsMA li{position:relative;display:block;}/*!sc*/
+.eudsMA .hoverable{display:inline-block;}/*!sc*/
+.eudsMA .selected{outline-style:solid;outline-width:1px;outline-style:dotted;}/*!sc*/
+.eudsMA .collapsed>.collapsible{display:none;}/*!sc*/
+.eudsMA .ellipsis{display:none;}/*!sc*/
+.eudsMA .collapsed>.ellipsis{display:inherit;}/*!sc*/
+data-styled.g50[id="sc-eRJQtA"]{content:"eudsMA,"}/*!sc*/
+.caaBgn{padding:0.9em;background-color:rgba(38,50,56,0.4);margin:0 0 10px 0;display:block;font-family:Montserrat,sans-serif;font-size:0.929em;line-height:1.5em;}/*!sc*/
+data-styled.g51[id="sc-bFwXsg"]{content:"caaBgn,"}/*!sc*/
+.TqlOY{font-family:Montserrat,sans-serif;font-size:12px;position:absolute;z-index:1;top:-11px;left:12px;font-weight:600;color:rgba(255,255,255,0.7);}/*!sc*/
+data-styled.g52[id="sc-fUPiRJ"]{content:"TqlOY,"}/*!sc*/
+.fpFYoG{position:relative;}/*!sc*/
+data-styled.g53[id="sc-bXYrjy"]{content:"fpFYoG,"}/*!sc*/
+.kuvBhH{margin-top:15px;}/*!sc*/
+data-styled.g56[id="sc-bgpKpp"]{content:"kuvBhH,"}/*!sc*/
+.fmWEAp.deprecated span.property-name{text-decoration:line-through;color:#707070;}/*!sc*/
+.fmWEAp button{background-color:transparent;border:0;outline:0;font-size:13px;font-family:Courier,monospace;cursor:pointer;padding:0;color:#333333;}/*!sc*/
+.fmWEAp button:focus{font-weight:600;}/*!sc*/
+.fmWEAp .sc-dibcMh{height:1.1em;width:1.1em;}/*!sc*/
+.fmWEAp .sc-dibcMh polygon{fill:#666;}/*!sc*/
+data-styled.g57[id="sc-iyUCga"]{content:"fmWEAp,"}/*!sc*/
+.eyIabj{vertical-align:middle;font-size:13px;line-height:20px;}/*!sc*/
+data-styled.g58[id="sc-byRegH"]{content:"eyIabj,"}/*!sc*/
+.jGdyyu{color:rgba(102,102,102,0.9);}/*!sc*/
+data-styled.g59[id="sc-budtlk"]{content:"jGdyyu,"}/*!sc*/
+.fcQkkm{color:#666;}/*!sc*/
+data-styled.g60[id="sc-fJvEKN"]{content:"fcQkkm,"}/*!sc*/
+.iUhYwd{color:#d41f1c;font-size:0.9em;font-weight:normal;margin-left:20px;line-height:1;}/*!sc*/
+data-styled.g62[id="sc-isZTFa"]{content:"iUhYwd,"}/*!sc*/
+.ewbVMc{border-radius:2px;word-break:break-word;background-color:rgba(51,51,51,0.05);color:rgba(51,51,51,0.9);padding:0 5px;border:1px solid rgba(51,51,51,0.1);font-family:Courier,monospace;}/*!sc*/
++{margin-left:0;}/*!sc*/
+data-styled.g66[id="sc-dEAvcG"]{content:"ewbVMc,"}/*!sc*/
+.gqMqVY{border-radius:2px;background-color:rgba(104,104,207,0.05);color:rgba(50,50,159,0.9);margin:0 5px;padding:0 5px;border:1px solid rgba(50,50,159,0.1);}/*!sc*/
++{margin-left:0;}/*!sc*/
+data-styled.g68[id="sc-fYNhqQ"]{content:"gqMqVY,"}/*!sc*/
+.eSQudw:after{content:' and ';font-weight:normal;}/*!sc*/
+.eSQudw:last-child:after{content:none;}/*!sc*/
+.eSQudw a{text-decoration:auto;color:#32329f;}/*!sc*/
+.eSQudw a:visited{color:#32329f;}/*!sc*/
+.eSQudw a:hover{color:#6868cf;text-decoration:auto;}/*!sc*/
+data-styled.g81[id="sc-hFPzkB"]{content:"eSQudw,"}/*!sc*/
+.WPZDV{white-space:nowrap;}/*!sc*/
+.WPZDV:after{content:' or ';white-space:pre;}/*!sc*/
+.WPZDV:last-child:after,.WPZDV:only-child:after{content:none;}/*!sc*/
+.WPZDV a{text-decoration:auto;color:#32329f;}/*!sc*/
+.WPZDV a:visited{color:#32329f;}/*!sc*/
+.WPZDV a:hover{color:#6868cf;text-decoration:auto;}/*!sc*/
+data-styled.g82[id="sc-iFRVkA"]{content:"WPZDV,"}/*!sc*/
+.gqqgtC{flex:1 1 auto;cursor:pointer;}/*!sc*/
+data-styled.g83[id="sc-ilCyfT"]{content:"gqqgtC,"}/*!sc*/
+.dNXpfB{width:75%;text-overflow:ellipsis;border-radius:4px;overflow:hidden;}/*!sc*/
+@media screen and (max-width: 50rem){.dNXpfB{margin-top:10px;}}/*!sc*/
+data-styled.g84[id="sc-jlEUfS"]{content:"dNXpfB,"}/*!sc*/
+.jefPco{display:inline-block;margin:0;}/*!sc*/
+data-styled.g85[id="sc-gUMLBR"]{content:"jefPco,"}/*!sc*/
+.iaIgja{width:100%;display:flex;margin:1em 0;flex-direction:row;}/*!sc*/
+@media screen and (max-width: 50rem){.iaIgja{flex-direction:column;}}/*!sc*/
+data-styled.g86[id="sc-hUPhBQ"]{content:"iaIgja,"}/*!sc*/
+.hLxGCH{margin-top:0;margin-bottom:0.5em;}/*!sc*/
+data-styled.g92[id="sc-jxDJBN"]{content:"hLxGCH,"}/*!sc*/
+.iZbnSR{overflow:hidden;}/*!sc*/
+data-styled.g95[id="sc-exiKtA"]{content:"iZbnSR,"}/*!sc*/
+.gMAaXs{display:flex;flex-wrap:wrap;margin-left:-15px;}/*!sc*/
+data-styled.g96[id="sc-iMAVTd"]{content:"gMAaXs,"}/*!sc*/
+.kfVmAL{width:9ex;display:inline-block;height:13px;line-height:13px;background-color:#333;border-radius:3px;background-repeat:no-repeat;background-position:6px 4px;font-size:7px;font-family:Verdana,sans-serif;color:white;text-transform:uppercase;text-align:center;font-weight:bold;vertical-align:middle;margin-right:6px;margin-top:2px;}/*!sc*/
+.kfVmAL.get{background-color:#2F8132;}/*!sc*/
+.kfVmAL.post{background-color:#186FAF;}/*!sc*/
+.kfVmAL.put{background-color:#95507c;}/*!sc*/
+.kfVmAL.options{background-color:#947014;}/*!sc*/
+.kfVmAL.patch{background-color:#bf581d;}/*!sc*/
+.kfVmAL.delete{background-color:#cc3333;}/*!sc*/
+.kfVmAL.basic{background-color:#707070;}/*!sc*/
+.kfVmAL.link{background-color:#07818F;}/*!sc*/
+.kfVmAL.head{background-color:#A23DAD;}/*!sc*/
+.kfVmAL.hook{background-color:#32329f;}/*!sc*/
+.kfVmAL.schema{background-color:#707070;}/*!sc*/
+data-styled.g100[id="sc-jsGcFV"]{content:"kfVmAL,"}/*!sc*/
+.bquqCV{margin:0;padding:0;}/*!sc*/
+.bquqCV:first-child{padding-bottom:32px;}/*!sc*/
+.sc-FhnSQ .sc-FhnSQ{font-size:0.929em;}/*!sc*/
+.jtzvEg{margin:0;padding:0;display:none;}/*!sc*/
+.jtzvEg:first-child{padding-bottom:32px;}/*!sc*/
+.sc-FhnSQ .sc-FhnSQ{font-size:0.929em;}/*!sc*/
+data-styled.g101[id="sc-FhnSQ"]{content:"bquqCV,jtzvEg,"}/*!sc*/
+.dsPLkk{list-style:none inside none;overflow:hidden;text-overflow:ellipsis;padding:0;}/*!sc*/
+data-styled.g102[id="sc-cwcSVF"]{content:"dsPLkk,"}/*!sc*/
+.cNpcJW{cursor:pointer;color:#333333;margin:0;padding:12.5px 20px;display:flex;justify-content:space-between;font-family:Montserrat,sans-serif;font-size:0.929em;text-transform:none;background-color:#fafafa;}/*!sc*/
+.cNpcJW:hover{color:#32329f;background-color:#e1e1e1;}/*!sc*/
+.cNpcJW .sc-dibcMh{height:1.5em;width:1.5em;}/*!sc*/
+.cNpcJW .sc-dibcMh polygon{fill:#333333;}/*!sc*/
+.bqKYCQ{cursor:pointer;color:#333333;margin:0;padding:12.5px 20px;display:flex;justify-content:space-between;font-family:Montserrat,sans-serif;background-color:#fafafa;}/*!sc*/
+.bqKYCQ:hover{color:#32329f;background-color:#ededed;}/*!sc*/
+.bqKYCQ .sc-dibcMh{height:1.5em;width:1.5em;}/*!sc*/
+.bqKYCQ .sc-dibcMh polygon{fill:#333333;}/*!sc*/
+data-styled.g103[id="sc-fuBaRS"]{content:"cNpcJW,bqKYCQ,"}/*!sc*/
+.dsZUKj{display:inline-block;vertical-align:middle;width:calc(100% - 38px);overflow:hidden;text-overflow:ellipsis;}/*!sc*/
+data-styled.g104[id="sc-hlwFUH"]{content:"dsZUKj,"}/*!sc*/
+.eVjdzv{font-size:0.8em;margin-top:10px;text-align:center;position:fixed;width:260px;bottom:0;background:#fafafa;}/*!sc*/
+.eVjdzv a,.eVjdzv a:visited,.eVjdzv a:hover{color:#333333!important;padding:5px 0;border-top:1px solid #e1e1e1;text-decoration:none;display:flex;align-items:center;justify-content:center;}/*!sc*/
+.eVjdzv img{width:15px;margin-right:5px;}/*!sc*/
+@media screen and (max-width: 50rem){.eVjdzv{width:100%;}}/*!sc*/
+data-styled.g105[id="sc-kXtNZI"]{content:"eVjdzv,"}/*!sc*/
+.cgvUrj{cursor:pointer;position:relative;margin-bottom:5px;}/*!sc*/
+data-styled.g111[id="sc-eUzzst"]{content:"cgvUrj,"}/*!sc*/
+.hgvsuc{font-family:Courier,monospace;margin-left:10px;flex:1;overflow-x:hidden;text-overflow:ellipsis;}/*!sc*/
+data-styled.g112[id="sc-jgoAos"]{content:"hgvsuc,"}/*!sc*/
+.ecNgtW{outline:0;color:inherit;width:100%;text-align:left;cursor:pointer;padding:10px 30px 10px 20px;border-radius:4px 4px 0 0;background-color:#11171a;display:flex;white-space:nowrap;align-items:center;border:1px solid transparent;border-bottom:0;transition:border-color 0.25s ease;}/*!sc*/
+.ecNgtW ..sc-jgoAos{color:#ffffff;}/*!sc*/
+.ecNgtW:focus{box-shadow:inset 0 2px 2px rgba(0, 0, 0, 0.45),0 2px 0 rgba(128, 128, 128, 0.25);}/*!sc*/
+data-styled.g113[id="sc-bpAAPv"]{content:"ecNgtW,"}/*!sc*/
+.bxmdGF{font-size:0.929em;line-height:20px;background-color:#186FAF;color:#ffffff;padding:3px 10px;text-transform:uppercase;font-family:Montserrat,sans-serif;margin:0;}/*!sc*/
+data-styled.g114[id="sc-fBpBLu"]{content:"bxmdGF,"}/*!sc*/
+.bVkkkk{position:absolute;width:100%;z-index:100;background:#fafafa;color:#263238;box-sizing:border-box;box-shadow:0 0 6px rgba(0, 0, 0, 0.33);overflow:hidden;border-bottom-left-radius:4px;border-bottom-right-radius:4px;transition:all 0.25s ease;visibility:hidden;transform:translateY(-50%) scaleY(0);}/*!sc*/
+data-styled.g115[id="sc-dXqqap"]{content:"bVkkkk,"}/*!sc*/
+.jlEXoB{padding:10px;}/*!sc*/
+data-styled.g116[id="sc-ijfqWo"]{content:"jlEXoB,"}/*!sc*/
+.zPpwX{padding:5px;border:1px solid #ccc;background:#fff;word-break:break-all;color:#32329f;}/*!sc*/
+.zPpwX >span{color:#333333;}/*!sc*/
+data-styled.g117[id="sc-srrxr"]{content:"zPpwX,"}/*!sc*/
+.dMNSOR{text-transform:lowercase;margin-left:0;line-height:1.5em;}/*!sc*/
+data-styled.g118[id="sc-eEgstq"]{content:"dMNSOR,"}/*!sc*/
+.gfsyZD{display:block;border:0;width:100%;text-align:left;padding:10px;border-radius:2px;margin-bottom:4px;line-height:1.5em;cursor:pointer;color:#1d8127;background-color:rgba(29,129,39,0.07);}/*!sc*/
+.gfsyZD:focus{outline:auto #1d8127;}/*!sc*/
+.eNjFmB{display:block;border:0;width:100%;text-align:left;padding:10px;border-radius:2px;margin-bottom:4px;line-height:1.5em;cursor:pointer;color:#d41f1c;background-color:rgba(212,31,28,0.07);}/*!sc*/
+.eNjFmB:focus{outline:auto #d41f1c;}/*!sc*/
+.kdKxoT{display:block;border:0;width:100%;text-align:left;padding:10px;border-radius:2px;margin-bottom:4px;line-height:1.5em;cursor:pointer;color:#d41f1c;background-color:rgba(212,31,28,0.07);cursor:default;}/*!sc*/
+.kdKxoT:focus{outline:auto #d41f1c;}/*!sc*/
+.kdKxoT::before{content:"—";font-weight:bold;width:1.5em;text-align:center;display:inline-block;vertical-align:top;}/*!sc*/
+.kdKxoT:focus{outline:0;}/*!sc*/
+data-styled.g120[id="sc-jthNAk"]{content:"gfsyZD,eNjFmB,kdKxoT,"}/*!sc*/
+.ecXPYN{vertical-align:top;}/*!sc*/
+data-styled.g123[id="sc-eOObWA"]{content:"ecXPYN,"}/*!sc*/
+.jWGRrJ{font-size:1.3em;padding:0.2em 0;margin:3em 0 1.1em;color:#333333;font-weight:normal;}/*!sc*/
+data-styled.g124[id="sc-gSVmdp"]{content:"jWGRrJ,"}/*!sc*/
+.fARMpn{margin-bottom:30px;}/*!sc*/
+data-styled.g129[id="sc-bkBUWa"]{content:"fARMpn,"}/*!sc*/
+.dpoYnd{user-select:none;width:20px;height:20px;align-self:center;display:flex;flex-direction:column;color:#32329f;}/*!sc*/
+data-styled.g130[id="sc-doJfcP"]{content:"dpoYnd,"}/*!sc*/
+.eMcOhX{width:260px;background-color:#fafafa;overflow:hidden;display:flex;flex-direction:column;backface-visibility:hidden;height:100vh;position:sticky;position:-webkit-sticky;top:0;}/*!sc*/
+@media screen and (max-width: 50rem){.eMcOhX{position:fixed;z-index:20;width:100%;background:#fafafa;display:none;}}/*!sc*/
+@media print{.eMcOhX{display:none;}}/*!sc*/
+data-styled.g131[id="sc-fnaTjL"]{content:"eMcOhX,"}/*!sc*/
+.Flmyj{outline:none;user-select:none;background-color:#f2f2f2;color:#32329f;display:none;cursor:pointer;position:fixed;right:20px;z-index:100;border-radius:50%;box-shadow:0 0 20px rgba(0, 0, 0, 0.3);bottom:44px;width:60px;height:60px;padding:0 20px;}/*!sc*/
+@media screen and (max-width: 50rem){.Flmyj{display:flex;}}/*!sc*/
+.Flmyj svg{color:#0065FB;}/*!sc*/
+@media print{.Flmyj{display:none;}}/*!sc*/
+data-styled.g132[id="sc-jyPUfK"]{content:"Flmyj,"}/*!sc*/
+.ePGUxG{font-family:Roboto,sans-serif;font-size:14px;font-weight:400;line-height:1.5em;color:#333333;display:flex;position:relative;text-align:left;-webkit-font-smoothing:antialiased;font-smoothing:antialiased;text-rendering:optimizeSpeed!important;tap-highlight-color:rgba(0, 0, 0, 0);text-size-adjust:100%;}/*!sc*/
+.ePGUxG *{box-sizing:border-box;-webkit-tap-highlight-color:rgba(255, 255, 255, 0);}/*!sc*/
+data-styled.g133[id="sc-JNBUd"]{content:"ePGUxG,"}/*!sc*/
+.bDhhVR{z-index:1;position:relative;overflow:hidden;width:calc(100% - 260px);contain:layout;}/*!sc*/
+@media print,screen and (max-width: 50rem){.bDhhVR{width:100%;}}/*!sc*/
+data-styled.g134[id="sc-eVCCQc"]{content:"bDhhVR,"}/*!sc*/
+.haiOeP{background:#263238;position:absolute;top:0;bottom:0;right:0;width:calc((100% - 260px) * 0.4);}/*!sc*/
+@media print,screen and (max-width: 75rem){.haiOeP{display:none;}}/*!sc*/
+data-styled.g135[id="sc-epRJRH"]{content:"haiOeP,"}/*!sc*/
+.jbjAuv{padding:5px 0;}/*!sc*/
+data-styled.g136[id="sc-iBGKNG"]{content:"jbjAuv,"}/*!sc*/
+.jVkBYH{width:calc(100% - 40px);box-sizing:border-box;margin:0 20px;padding:5px 10px 5px 20px;border:0;border-bottom:1px solid #e1e1e1;font-family:Roboto,sans-serif;font-weight:bold;font-size:13px;color:#333333;background-color:transparent;outline:none;}/*!sc*/
+data-styled.g137[id="sc-lcacaV"]{content:"jVkBYH,"}/*!sc*/
+.gXFsok{position:absolute;left:20px;height:1.8em;width:0.9em;}/*!sc*/
+.gXFsok path{fill:#333333;}/*!sc*/
+data-styled.g138[id="sc-dYttxY"]{content:"gXFsok,"}/*!sc*/
+</style>
+  <link href="https://fonts.googleapis.com/css?family=Montserrat:300,400,700|Roboto:300,400,700" rel="stylesheet">
+</head>
+
+<body>
+  
+      <div id="redoc"><div class="sc-JNBUd ePGUxG redoc-wrap"><div class="sc-fnaTjL eMcOhX menu-content" style="top:0px;height:calc(100vh - 0px)"><div role="search" class="sc-iBGKNG jbjAuv"><svg class="sc-dYttxY gXFsok search-icon" version="1.1" viewBox="0 0 1000 1000" x="0px" xmlns="http://www.w3.org/2000/svg" y="0px"><path d="M968.2,849.4L667.3,549c83.9-136.5,66.7-317.4-51.7-435.6C477.1-25,252.5-25,113.9,113.4c-138.5,138.3-138.5,362.6,0,501C219.2,730.1,413.2,743,547.6,666.5l301.9,301.4c43.6,43.6,76.9,14.9,104.2-12.4C981,928.3,1011.8,893,968.2,849.4z M524.5,522c-88.9,88.7-233,88.7-321.8,0c-88.9-88.7-88.9-232.6,0-321.3c88.9-88.7,233-88.7,321.8,0C613.4,289.4,613.4,433.3,524.5,522z"></path></svg><input placeholder="Search..." aria-label="Search" type="text" class="sc-lcacaV jVkBYH search-input" value=""/></div><div class="sc-epGxBs dkdAtf scrollbar-container undefined"><ul role="menu" class="sc-FhnSQ bquqCV"><li tabindex="0" depth="1" data-item-id="tag/Payments" role="menuitem" aria-label="Payments" aria-expanded="false" class="sc-cwcSVF dsPLkk"><label class="sc-fuBaRS cNpcJW -depth1"><span width="calc(100% - 38px)" title="Payments" class="sc-hlwFUH dsZUKj">Payments</span><svg class="sc-dibcMh bnalXq" version="1.1" viewBox="0 0 24 24" x="0" xmlns="http://www.w3.org/2000/svg" y="0" aria-hidden="true"><polygon points="17.3 8.3 12 13.6 6.7 8.3 5.3 9.7 12 16.4 18.7 9.7 "></polygon></svg></label><ul class="sc-FhnSQ jtzvEg"><li tabindex="0" depth="2" data-item-id="tag/Payments/operation/createCharge" role="menuitem" aria-label="Process Apple Pay payment" aria-expanded="false" class="sc-cwcSVF dsPLkk"><label class="sc-fuBaRS bqKYCQ -depth2"><span type="post" class="sc-jsGcFV kfVmAL operation-type post">post</span><span tabindex="0" width="calc(100% - 38px)" class="sc-hlwFUH dsZUKj">Process Apple Pay payment</span></label></li></ul></li><li tabindex="0" depth="1" data-item-id="tag/Webhooks" role="menuitem" aria-label="Webhooks" aria-expanded="false" class="sc-cwcSVF dsPLkk"><label class="sc-fuBaRS cNpcJW -depth1"><span width="calc(100% - 38px)" title="Webhooks" class="sc-hlwFUH dsZUKj">Webhooks</span><svg class="sc-dibcMh bnalXq" version="1.1" viewBox="0 0 24 24" x="0" xmlns="http://www.w3.org/2000/svg" y="0" aria-hidden="true"><polygon points="17.3 8.3 12 13.6 6.7 8.3 5.3 9.7 12 16.4 18.7 9.7 "></polygon></svg></label><ul class="sc-FhnSQ jtzvEg"><li tabindex="0" depth="2" data-item-id="tag/Webhooks/operation/webhook" role="menuitem" aria-label="Receive webhook notifications from Tap Payments" aria-expanded="false" class="sc-cwcSVF dsPLkk"><label class="sc-fuBaRS bqKYCQ -depth2"><span type="post" class="sc-jsGcFV kfVmAL operation-type post">post</span><span tabindex="0" width="calc(100% - 38px)" class="sc-hlwFUH dsZUKj">Receive webhook notifications from Tap Payments</span></label></li></ul></li></ul><div class="sc-kXtNZI eVjdzv"><a target="_blank" rel="noopener noreferrer" href="https://redocly.com/redoc/">API docs by Redocly</a></div></div></div><div class="sc-jyPUfK Flmyj"><div class="sc-doJfcP dpoYnd"><svg class="" style="transform:translate(2px, -4px) rotate(180deg);transition:transform 0.2s ease" viewBox="0 0 926.23699 573.74994" version="1.1" x="0px" y="0px" width="15" height="15"><g transform="translate(904.92214,-879.1482)"><path d="
+          m -673.67664,1221.6502 -231.2455,-231.24803 55.6165,
+          -55.627 c 30.5891,-30.59485 56.1806,-55.627 56.8701,-55.627 0.6894,
+          0 79.8637,78.60862 175.9427,174.68583 l 174.6892,174.6858 174.6892,
+          -174.6858 c 96.079,-96.07721 175.253196,-174.68583 175.942696,
+          -174.68583 0.6895,0 26.281,25.03215 56.8701,
+          55.627 l 55.6165,55.627 -231.245496,231.24803 c -127.185,127.1864
+          -231.5279,231.248 -231.873,231.248 -0.3451,0 -104.688,
+          -104.0616 -231.873,-231.248 z
+        " fill="currentColor"></path></g></svg><svg class="" style="transform:translate(2px, 4px);transition:transform 0.2s ease" viewBox="0 0 926.23699 573.74994" version="1.1" x="0px" y="0px" width="15" height="15"><g transform="translate(904.92214,-879.1482)"><path d="
+          m -673.67664,1221.6502 -231.2455,-231.24803 55.6165,
+          -55.627 c 30.5891,-30.59485 56.1806,-55.627 56.8701,-55.627 0.6894,
+          0 79.8637,78.60862 175.9427,174.68583 l 174.6892,174.6858 174.6892,
+          -174.6858 c 96.079,-96.07721 175.253196,-174.68583 175.942696,
+          -174.68583 0.6895,0 26.281,25.03215 56.8701,
+          55.627 l 55.6165,55.627 -231.245496,231.24803 c -127.185,127.1864
+          -231.5279,231.248 -231.873,231.248 -0.3451,0 -104.688,
+          -104.0616 -231.873,-231.248 z
+        " fill="currentColor"></path></g></svg></div></div><div class="sc-eVCCQc bDhhVR api-content"><div class="sc-dYOLZc kDuBQd"><div class="sc-jZhnRx tMeMv"><div class="sc-gwsNht iRoSfe api-info"><h1 class="sc-hBDmJg sc-jxDJBN dKykVD hLxGCH">Tap Payments API<!-- --> <span>(<!-- -->1.0.0<!-- -->)</span></h1><p>Download OpenAPI specification<!-- -->:</p><div class="sc-faJlkc sc-fdduAw kOqeZB kEOvim"><div class="sc-exiKtA iZbnSR"><div class="sc-iMAVTd gMAaXs"> <!-- --> <!-- --> </div></div></div><div data-role="redoc-summary" html="" class="sc-faJlkc sc-fdduAw kOqeZB kEOvim"></div><div data-role="redoc-description" html="&lt;p&gt;API for processing payments through Tap Payments with Apple Pay integration.&lt;/p&gt;
+&lt;p&gt;This API allows clients to process Apple Pay payments and receive webhook notifications
+from Tap Payments.&lt;/p&gt;
+" class="sc-faJlkc sc-fdduAw kOqeZB kEOvim"><p>API for processing payments through Tap Payments with Apple Pay integration.</p>
+<p>This API allows clients to process Apple Pay payments and receive webhook notifications
+from Tap Payments.</p>
+</div></div></div></div><div id="tag/Payments" data-section-id="tag/Payments" class="sc-dYOLZc kDuBQd"><div class="sc-jZhnRx tMeMv"><div class="sc-gwsNht iRoSfe"><h2 class="sc-kThouk jkwlQD"><a class="sc-kieALA jOWzfS" href="#tag/Payments" aria-label="tag/Payments"></a>Payments</h2></div></div><div class="sc-gwsNht ciCSbi"><div class="sc-faJlkc sc-fdduAw kOqeZB kEOvim redoc-markdown " html="&lt;p&gt;Payment processing endpoints&lt;/p&gt;
+"><p>Payment processing endpoints</p>
+</div></div></div><div id="tag/Payments/operation/createCharge" data-section-id="tag/Payments/operation/createCharge" class="sc-dYOLZc dRVblm"><div data-section-id="operation/createCharge" id="operation/createCharge" class="sc-jZhnRx tMeMv"><div class="sc-gwsNht iRoSfe"><h2 class="sc-kThouk jkwlQD"><a class="sc-kieALA jOWzfS" href="#tag/Payments/operation/createCharge" aria-label="tag/Payments/operation/createCharge"></a>Process Apple Pay payment<!-- --> </h2><div class="sc-bkBUWa fARMpn"><div html="&lt;p&gt;Process a payment using Apple Pay token.&lt;/p&gt;
+&lt;p&gt;This endpoint accepts an Apple Pay token along with payment details,
+converts it to a Tap Payments token, and creates a charge.&lt;/p&gt;
+" class="sc-faJlkc sc-fdduAw kOqeZB kEOvim"><p>Process a payment using Apple Pay token.</p>
+<p>This endpoint accepts an Apple Pay token along with payment details,
+converts it to a Tap Payments token, and creates a charge.</p>
+</div></div><div class="sc-hUPhBQ iaIgja"><div class="sc-ilCyfT gqqgtC"><h5 class="sc-elFkmj sc-gUMLBR eUkINt jefPco">Authorizations:</h5><svg class="sc-dibcMh gsIrbT" version="1.1" viewBox="0 0 24 24" x="0" xmlns="http://www.w3.org/2000/svg" y="0" aria-hidden="true"><polygon points="17.3 8.3 12 13.6 6.7 8.3 5.3 9.7 12 16.4 18.7 9.7 "></polygon></svg></div><div class="sc-jlEUfS dNXpfB"><span class="sc-iFRVkA WPZDV"><span class="sc-hFPzkB eSQudw"><i>sanctum</i></span></span></div></div><h5 class="sc-elFkmj eUkINt">Request Body schema: <span class="sc-edaYAx iFdOsg">application/json</span><div class="sc-byRegH sc-isZTFa sc-eEgstq eyIabj iUhYwd dMNSOR">required</div></h5><div html="" class="sc-faJlkc sc-fdduAw kOqeZB kEOvim"></div><table class="sc-eGjrzz cGiuNU"><tbody><tr class=""><td kind="field" title="amount" class="sc-kHNKno sc-frmfij cDFxGr kNAbAx"><span class="sc-hLyRwt lhCIDE"></span><span class="property-name">amount</span><div class="sc-byRegH sc-isZTFa eyIabj iUhYwd">required</div></td><td class="sc-groBii dzPbxx"><div><div><span class="sc-byRegH sc-budtlk eyIabj jGdyyu"></span><span class="sc-byRegH sc-fJvEKN eyIabj fcQkkm">number</span><span class="sc-byRegH sc-fJvEKN eyIabj fcQkkm"> <!-- -->&lt;<!-- -->float<!-- -->&gt;<!-- --> </span><span> <span class="sc-byRegH sc-fYNhqQ eyIabj gqMqVY"> <!-- -->&gt;= 0.1<!-- --> </span></span></div> <div><div html="&lt;p&gt;Payment amount&lt;/p&gt;
+" class="sc-faJlkc sc-fdduAw kOqeZB csbUjU"><p>Payment amount</p>
+</div></div></div></td></tr><tr class=""><td kind="field" title="currency" class="sc-kHNKno sc-frmfij cDFxGr kNAbAx"><span class="sc-hLyRwt lhCIDE"></span><span class="property-name">currency</span></td><td class="sc-groBii dzPbxx"><div><div><span class="sc-byRegH sc-budtlk eyIabj jGdyyu"></span><span class="sc-byRegH sc-fJvEKN eyIabj fcQkkm">string</span><span> <span class="sc-byRegH sc-fYNhqQ eyIabj gqMqVY"> <!-- -->= 3 characters<!-- --> </span></span></div><div><span class="sc-byRegH eyIabj"> <!-- -->Default:<!-- --> </span> <span class="sc-byRegH sc-dEAvcG eyIabj ewbVMc">&quot;KWD&quot;</span></div> <div><div html="&lt;p&gt;Payment currency (ISO 4217 code)&lt;/p&gt;
+" class="sc-faJlkc sc-fdduAw kOqeZB csbUjU"><p>Payment currency (ISO 4217 code)</p>
+</div></div></div></td></tr><tr class=""><td kind="field" title="customer_name" class="sc-kHNKno sc-frmfij cDFxGr kNAbAx"><span class="sc-hLyRwt lhCIDE"></span><span class="property-name">customer_name</span><div class="sc-byRegH sc-isZTFa eyIabj iUhYwd">required</div></td><td class="sc-groBii dzPbxx"><div><div><span class="sc-byRegH sc-budtlk eyIabj jGdyyu"></span><span class="sc-byRegH sc-fJvEKN eyIabj fcQkkm">string</span></div> <div><div html="&lt;p&gt;Customer name&lt;/p&gt;
+" class="sc-faJlkc sc-fdduAw kOqeZB csbUjU"><p>Customer name</p>
+</div></div></div></td></tr><tr class=""><td kind="field" title="customer_email" class="sc-kHNKno sc-frmfij cDFxGr kNAbAx"><span class="sc-hLyRwt lhCIDE"></span><span class="property-name">customer_email</span><div class="sc-byRegH sc-isZTFa eyIabj iUhYwd">required</div></td><td class="sc-groBii dzPbxx"><div><div><span class="sc-byRegH sc-budtlk eyIabj jGdyyu"></span><span class="sc-byRegH sc-fJvEKN eyIabj fcQkkm">string</span><span class="sc-byRegH sc-fJvEKN eyIabj fcQkkm"> <!-- -->&lt;<!-- -->email<!-- -->&gt;<!-- --> </span></div> <div><div html="&lt;p&gt;Customer email&lt;/p&gt;
+" class="sc-faJlkc sc-fdduAw kOqeZB csbUjU"><p>Customer email</p>
+</div></div></div></td></tr><tr class=""><td kind="field" title="customer_phone" class="sc-kHNKno sc-frmfij cDFxGr kNAbAx"><span class="sc-hLyRwt lhCIDE"></span><span class="property-name">customer_phone</span></td><td class="sc-groBii dzPbxx"><div><div><span class="sc-byRegH sc-budtlk eyIabj jGdyyu"></span><span class="sc-byRegH sc-fJvEKN eyIabj fcQkkm">string</span></div> <div><div html="&lt;p&gt;Customer phone number&lt;/p&gt;
+" class="sc-faJlkc sc-fdduAw kOqeZB csbUjU"><p>Customer phone number</p>
+</div></div></div></td></tr><tr class=""><td kind="field" title="description" class="sc-kHNKno sc-frmfij cDFxGr kNAbAx"><span class="sc-hLyRwt lhCIDE"></span><span class="property-name">description</span></td><td class="sc-groBii dzPbxx"><div><div><span class="sc-byRegH sc-budtlk eyIabj jGdyyu"></span><span class="sc-byRegH sc-fJvEKN eyIabj fcQkkm">string</span></div> <div><div html="&lt;p&gt;Payment description&lt;/p&gt;
+" class="sc-faJlkc sc-fdduAw kOqeZB csbUjU"><p>Payment description</p>
+</div></div></div></td></tr><tr class=""><td kind="field" title="reference_id" class="sc-kHNKno sc-frmfij cDFxGr kNAbAx"><span class="sc-hLyRwt lhCIDE"></span><span class="property-name">reference_id</span></td><td class="sc-groBii dzPbxx"><div><div><span class="sc-byRegH sc-budtlk eyIabj jGdyyu"></span><span class="sc-byRegH sc-fJvEKN eyIabj fcQkkm">string</span></div> <div><div html="&lt;p&gt;External reference ID&lt;/p&gt;
+" class="sc-faJlkc sc-fdduAw kOqeZB csbUjU"><p>External reference ID</p>
+</div></div></div></td></tr><tr class="last "><td kind="field" title="token_data" class="sc-kHNKno sc-frmfij sc-iyUCga cDFxGr kNAbAx fmWEAp"><span class="sc-hLyRwt lhCIDE"></span><button aria-label="expand token_data"><span class="property-name">token_data</span><svg class="sc-dibcMh eVNtOe" version="1.1" viewBox="0 0 24 24" x="0" xmlns="http://www.w3.org/2000/svg" y="0" aria-hidden="true"><polygon points="17.3 8.3 12 13.6 6.7 8.3 5.3 9.7 12 16.4 18.7 9.7 "></polygon></svg></button><div class="sc-byRegH sc-isZTFa eyIabj iUhYwd">required</div></td><td class="sc-groBii dzPbxx"><div><div><span class="sc-byRegH sc-budtlk eyIabj jGdyyu"></span><span class="sc-byRegH sc-fJvEKN eyIabj fcQkkm">object</span></div> <div><div html="" class="sc-faJlkc sc-fdduAw kOqeZB csbUjU"></div></div></div></td></tr></tbody></table><div><h3 class="sc-gSVmdp jWGRrJ">Responses</h3><div><button class="sc-jthNAk gfsyZD"><svg class="sc-dibcMh dpIKEE" version="1.1" viewBox="0 0 24 24" x="0" xmlns="http://www.w3.org/2000/svg" y="0" aria-hidden="true"><polygon points="17.3 8.3 12 13.6 6.7 8.3 5.3 9.7 12 16.4 18.7 9.7 "></polygon></svg><strong class="sc-eOObWA ecXPYN">200<!-- --> </strong><div html="&lt;p&gt;Payment processed successfully&lt;/p&gt;
+" class="sc-faJlkc sc-fdduAw sc-eINXvP kOqeZB kkltVg fbuMAW"><p>Payment processed successfully</p>
+</div></button></div><div><button class="sc-jthNAk eNjFmB"><svg class="sc-dibcMh jsRtRU" version="1.1" viewBox="0 0 24 24" x="0" xmlns="http://www.w3.org/2000/svg" y="0" aria-hidden="true"><polygon points="17.3 8.3 12 13.6 6.7 8.3 5.3 9.7 12 16.4 18.7 9.7 "></polygon></svg><strong class="sc-eOObWA ecXPYN">400<!-- --> </strong><div html="&lt;p&gt;Invalid request&lt;/p&gt;
+" class="sc-faJlkc sc-fdduAw sc-eINXvP kOqeZB kkltVg fbuMAW"><p>Invalid request</p>
+</div></button></div><div><button class="sc-jthNAk kdKxoT" disabled=""><strong class="sc-eOObWA ecXPYN">401<!-- --> </strong><div html="&lt;p&gt;Unauthorized&lt;/p&gt;
+" class="sc-faJlkc sc-fdduAw sc-eINXvP kOqeZB kkltVg fbuMAW"><p>Unauthorized</p>
+</div></button></div><div><button class="sc-jthNAk eNjFmB"><svg class="sc-dibcMh jsRtRU" version="1.1" viewBox="0 0 24 24" x="0" xmlns="http://www.w3.org/2000/svg" y="0" aria-hidden="true"><polygon points="17.3 8.3 12 13.6 6.7 8.3 5.3 9.7 12 16.4 18.7 9.7 "></polygon></svg><strong class="sc-eOObWA ecXPYN">422<!-- --> </strong><div html="&lt;p&gt;Validation error&lt;/p&gt;
+" class="sc-faJlkc sc-fdduAw sc-eINXvP kOqeZB kkltVg fbuMAW"><p>Validation error</p>
+</div></button></div><div><button class="sc-jthNAk eNjFmB"><svg class="sc-dibcMh jsRtRU" version="1.1" viewBox="0 0 24 24" x="0" xmlns="http://www.w3.org/2000/svg" y="0" aria-hidden="true"><polygon points="17.3 8.3 12 13.6 6.7 8.3 5.3 9.7 12 16.4 18.7 9.7 "></polygon></svg><strong class="sc-eOObWA ecXPYN">500<!-- --> </strong><div html="&lt;p&gt;Server error&lt;/p&gt;
+" class="sc-faJlkc sc-fdduAw sc-eINXvP kOqeZB kkltVg fbuMAW"><p>Server error</p>
+</div></button></div></div></div><div class="sc-jMpmlX sc-hoLldG kCcXaS jpPJrn"><div class="sc-eUzzst cgvUrj"><button class="sc-bpAAPv ecNgtW"><span type="post" class="sc-fBpBLu bxmdGF http-verb post">post</span><span class="sc-jgoAos hgvsuc">/tap-payments/charges</span><svg class="sc-dibcMh NOyYc" style="margin-right:-25px" version="1.1" viewBox="0 0 24 24" x="0" xmlns="http://www.w3.org/2000/svg" y="0" aria-hidden="true"><polygon points="17.3 8.3 12 13.6 6.7 8.3 5.3 9.7 12 16.4 18.7 9.7 "></polygon></svg></button><div aria-hidden="true" class="sc-dXqqap bVkkkk"><div class="sc-ijfqWo jlEXoB"><div html="&lt;p&gt;API base URL&lt;/p&gt;
+" class="sc-faJlkc sc-fdduAw kOqeZB csbUjU"><p>API base URL</p>
+</div><div tabindex="0" role="button"><div class="sc-srrxr zPpwX"><span>/api</span>/tap-payments/charges</div></div></div></div></div><div><h3 class="sc-llIIlC fdkIVZ"> <!-- -->Request samples<!-- --> </h3><div class="sc-cTIdZS dFpYBv" data-rttabs="true"><ul class="react-tabs__tab-list" role="tablist"><li class="react-tabs__tab react-tabs__tab--selected" role="tab" id="tab«R4ksq»0" aria-selected="true" aria-disabled="false" aria-controls="panel«R4ksq»0" tabindex="0" data-rttab="true">Payload</li></ul><div class="react-tabs__tab-panel react-tabs__tab-panel--selected" role="tabpanel" id="panel«R4ksq»0" aria-labelledby="tab«R4ksq»0"><div><div class="sc-bXYrjy fpFYoG"><span class="sc-fUPiRJ TqlOY">Content type</span><div class="sc-bFwXsg caaBgn">application/json</div></div><div class="sc-bgpKpp kuvBhH"><div class="sc-dRHutB iAOzgg"><div class="sc-VILhF itwxyW"><button><div class="sc-fIQtvO indwFD">Copy</div></button><button> Expand all </button><button> Collapse all </button></div><div tabindex="0" class="sc-faJlkc kOqeZB sc-eRJQtA eudsMA"><div class="redoc-json"><code><button class="collapser" aria-label="collapse"></button><span class="token punctuation">{</span><span class="ellipsis"></span><ul class="obj collapsible"><li><div class="hoverable "><span class="property token string">"amount"</span>: <span class="token number">10.5</span><span class="token punctuation">,</span></div></li><li><div class="hoverable "><span class="property token string">"currency"</span>: <span class="token string">&quot;KWD&quot;</span><span class="token punctuation">,</span></div></li><li><div class="hoverable "><span class="property token string">"customer_name"</span>: <span class="token string">&quot;John Doe&quot;</span><span class="token punctuation">,</span></div></li><li><div class="hoverable "><span class="property token string">"customer_email"</span>: <span class="token string">&quot;john.doe@example.com&quot;</span><span class="token punctuation">,</span></div></li><li><div class="hoverable "><span class="property token string">"customer_phone"</span>: <span class="token string">&quot;96512345678&quot;</span><span class="token punctuation">,</span></div></li><li><div class="hoverable "><span class="property token string">"description"</span>: <span class="token string">&quot;Payment for order&quot;</span><span class="token punctuation">,</span></div></li><li><div class="hoverable "><span class="property token string">"reference_id"</span>: <span class="token string">&quot;order_12345&quot;</span><span class="token punctuation">,</span></div></li><li><div class="hoverable "><span class="property token string">"token_data"</span>: <button class="collapser" aria-label="collapse"></button><span class="token punctuation">{</span><span class="ellipsis"></span><ul class="obj collapsible"><li><div class="hoverable collapsed"><span class="property token string">"data"</span>: <span class="token string">&quot;CM8i9PNK4yXtKO3xmOn6uyYOWmQ+iX9/Oc0EWHJZnPZ/IAEe2UYNCfely3dgq3veEygmQcl0s8lvMeCIZAbbBvbZWPKng9lfUwP2u3IUOFfFyI4beE9znpQ/e0nyQiVh8NFyZun8o0/YZfdFhaBy8bunveULZkWODZy3vg1LLTk0wSRfzbiFav/krgeMvztl8U85Fefl1VJVoJbW/jtShwDkusHizw/p/hkLiOFcCYSz7h9culZQMTWfqsxIfTuY3mOl+NhjAHPP+UFv4wefXrQL9MKO2cI6ttXOp5k6M6mFV/Qe0fbmJ6GnDWDMSiikW+3eL0yi0IApAKmmVgPS+uk42dyhrnSPhB6A7EJBmhEEb3ErL1I69Jq9REjDHp+VoZR0fAbDtpbjKKMo&quot;</span><span class="token punctuation">,</span></div></li><li><div class="hoverable collapsed"><span class="property token string">"header"</span>: <button class="collapser" aria-label="expand"></button><span class="token punctuation">{</span><span class="ellipsis"></span><ul class="obj collapsible"><li><div class="hoverable collapsed"><span class="property token string">"ephemeralPublicKey"</span>: <span class="token string">&quot;MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAELAfDie0Ie1TxCcrFt69BzcQ52+F+Fhm5mDw6pMR54AzoFMgdGPRbqoLtFpoSe0FI/m0cqRMOVM2W4Bz9jVZZHA==&quot;</span><span class="token punctuation">,</span></div></li><li><div class="hoverable collapsed"><span class="property token string">"publicKeyHash"</span>: <span class="token string">&quot;LjAAyv6vb6jOEkjfG7L1a5OR2uCTHIkB61DaYdEWD+w=&quot;</span><span class="token punctuation">,</span></div></li><li><div class="hoverable collapsed"><span class="property token string">"transactionId"</span>: <span class="token string">&quot;0c4352c073ad460044517596dbbf8fe503a837138c8c2de18fddb37ca3ec5295&quot;</span></div></li></ul><span class="token punctuation">}</span><span class="token punctuation">,</span></div></li><li><div class="hoverable collapsed"><span class="property token string">"signature"</span>: <span class="token string">&quot;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&quot;</span><span class="token punctuation">,</span></div></li><li><div class="hoverable collapsed"><span class="property token string">"version"</span>: <span class="token string">&quot;EC_v1&quot;</span></div></li></ul><span class="token punctuation">}</span></div></li></ul><span class="token punctuation">}</span></code></div></div></div></div></div></div></div></div><div><h3 class="sc-llIIlC fdkIVZ"> <!-- -->Response samples<!-- --> </h3><div class="sc-cTIdZS dFpYBv" data-rttabs="true"><ul class="react-tabs__tab-list" role="tablist"><li class="tab-success react-tabs__tab--selected" role="tab" id="tab«R4ssq»0" aria-selected="true" aria-disabled="false" aria-controls="panel«R4ssq»0" tabindex="0" data-rttab="true">200</li><li class="tab-error" role="tab" id="tab«R4ssq»1" aria-selected="false" aria-disabled="false" aria-controls="panel«R4ssq»1" data-rttab="true">400</li><li class="tab-error" role="tab" id="tab«R4ssq»2" aria-selected="false" aria-disabled="false" aria-controls="panel«R4ssq»2" data-rttab="true">422</li><li class="tab-error" role="tab" id="tab«R4ssq»3" aria-selected="false" aria-disabled="false" aria-controls="panel«R4ssq»3" data-rttab="true">500</li></ul><div class="react-tabs__tab-panel react-tabs__tab-panel--selected" role="tabpanel" id="panel«R4ssq»0" aria-labelledby="tab«R4ssq»0"><div><div class="sc-bXYrjy fpFYoG"><span class="sc-fUPiRJ TqlOY">Content type</span><div class="sc-bFwXsg caaBgn">application/json</div></div><div class="sc-bgpKpp kuvBhH"><div class="sc-dRHutB iAOzgg"><div class="sc-VILhF itwxyW"><button><div class="sc-fIQtvO indwFD">Copy</div></button></div><div tabindex="0" class="sc-faJlkc kOqeZB sc-eRJQtA eudsMA"><div class="redoc-json"><code><button class="collapser" aria-label="collapse"></button><span class="token punctuation">{</span><span class="ellipsis"></span><ul class="obj collapsible"><li><div class="hoverable "><span class="property token string">"success"</span>: <span class="token boolean">true</span><span class="token punctuation">,</span></div></li><li><div class="hoverable "><span class="property token string">"transaction_id"</span>: <span class="token string">&quot;txn_1234567890abcdef&quot;</span><span class="token punctuation">,</span></div></li><li><div class="hoverable "><span class="property token string">"charge_id"</span>: <span class="token string">&quot;chg_1234567890abcdef&quot;</span><span class="token punctuation">,</span></div></li><li><div class="hoverable "><span class="property token string">"status"</span>: <span class="token string">&quot;pending&quot;</span><span class="token punctuation">,</span></div></li><li><div class="hoverable "><span class="property token string">"payment_url"</span>: <span class="token string">&quot;</span><a href="https://checkout.tap.company/v2/checkout/12345">https://checkout.tap.company/v2/checkout/12345</a><span class="token string">&quot;</span></div></li></ul><span class="token punctuation">}</span></code></div></div></div></div></div></div><div class="react-tabs__tab-panel" role="tabpanel" id="panel«R4ssq»1" aria-labelledby="tab«R4ssq»1"></div><div class="react-tabs__tab-panel" role="tabpanel" id="panel«R4ssq»2" aria-labelledby="tab«R4ssq»2"></div><div class="react-tabs__tab-panel" role="tabpanel" id="panel«R4ssq»3" aria-labelledby="tab«R4ssq»3"></div></div></div></div></div></div><div id="tag/Webhooks" data-section-id="tag/Webhooks" class="sc-dYOLZc kDuBQd"><div class="sc-jZhnRx tMeMv"><div class="sc-gwsNht iRoSfe"><h2 class="sc-kThouk jkwlQD"><a class="sc-kieALA jOWzfS" href="#tag/Webhooks" aria-label="tag/Webhooks"></a>Webhooks</h2></div></div><div class="sc-gwsNht ciCSbi"><div class="sc-faJlkc sc-fdduAw kOqeZB kEOvim redoc-markdown " html="&lt;p&gt;Webhook notification endpoints&lt;/p&gt;
+"><p>Webhook notification endpoints</p>
+</div></div></div><div id="tag/Webhooks/operation/webhook" data-section-id="tag/Webhooks/operation/webhook" class="sc-dYOLZc dRVblm"><div data-section-id="operation/webhook" id="operation/webhook" class="sc-jZhnRx tMeMv"><div class="sc-gwsNht iRoSfe"><h2 class="sc-kThouk jkwlQD"><a class="sc-kieALA jOWzfS" href="#tag/Webhooks/operation/webhook" aria-label="tag/Webhooks/operation/webhook"></a>Receive webhook notifications from Tap Payments<!-- --> </h2><div class="sc-bkBUWa fARMpn"><div html="&lt;p&gt;Endpoint to receive webhook notifications from Tap Payments.&lt;/p&gt;
+&lt;p&gt;This endpoint processes webhook notifications for events such as
+successful charges, failed charges, etc.&lt;/p&gt;
+" class="sc-faJlkc sc-fdduAw kOqeZB kEOvim"><p>Endpoint to receive webhook notifications from Tap Payments.</p>
+<p>This endpoint processes webhook notifications for events such as
+successful charges, failed charges, etc.</p>
+</div></div><h5 class="sc-elFkmj eUkINt">Request Body schema: <span class="sc-edaYAx iFdOsg">application/json</span><div class="sc-byRegH sc-isZTFa sc-eEgstq eyIabj iUhYwd dMNSOR">required</div></h5><div html="" class="sc-faJlkc sc-fdduAw kOqeZB kEOvim"></div><table class="sc-eGjrzz cGiuNU"><tbody><tr class=""><td kind="field" title="id" class="sc-kHNKno sc-frmfij cDFxGr kNAbAx"><span class="sc-hLyRwt lhCIDE"></span><span class="property-name">id</span><div class="sc-byRegH sc-isZTFa eyIabj iUhYwd">required</div></td><td class="sc-groBii dzPbxx"><div><div><span class="sc-byRegH sc-budtlk eyIabj jGdyyu"></span><span class="sc-byRegH sc-fJvEKN eyIabj fcQkkm">string</span></div> <div><div html="&lt;p&gt;Event ID&lt;/p&gt;
+" class="sc-faJlkc sc-fdduAw kOqeZB csbUjU"><p>Event ID</p>
+</div></div></div></td></tr><tr class=""><td kind="field" title="event" class="sc-kHNKno sc-frmfij cDFxGr kNAbAx"><span class="sc-hLyRwt lhCIDE"></span><span class="property-name">event</span><div class="sc-byRegH sc-isZTFa eyIabj iUhYwd">required</div></td><td class="sc-groBii dzPbxx"><div><div><span class="sc-byRegH sc-budtlk eyIabj jGdyyu"></span><span class="sc-byRegH sc-fJvEKN eyIabj fcQkkm">string</span></div> <div><div html="&lt;p&gt;Event type&lt;/p&gt;
+" class="sc-faJlkc sc-fdduAw kOqeZB csbUjU"><p>Event type</p>
+</div></div></div></td></tr><tr class="last "><td kind="field" title="data" class="sc-kHNKno sc-frmfij sc-iyUCga cDFxGr kNAbAx fmWEAp"><span class="sc-hLyRwt lhCIDE"></span><button aria-label="expand data"><span class="property-name">data</span><svg class="sc-dibcMh eVNtOe" version="1.1" viewBox="0 0 24 24" x="0" xmlns="http://www.w3.org/2000/svg" y="0" aria-hidden="true"><polygon points="17.3 8.3 12 13.6 6.7 8.3 5.3 9.7 12 16.4 18.7 9.7 "></polygon></svg></button><div class="sc-byRegH sc-isZTFa eyIabj iUhYwd">required</div></td><td class="sc-groBii dzPbxx"><div><div><span class="sc-byRegH sc-budtlk eyIabj jGdyyu"></span><span class="sc-byRegH sc-fJvEKN eyIabj fcQkkm">object</span></div> <div><div html="&lt;p&gt;Event data&lt;/p&gt;
+" class="sc-faJlkc sc-fdduAw kOqeZB csbUjU"><p>Event data</p>
+</div></div></div></td></tr></tbody></table><div><h3 class="sc-gSVmdp jWGRrJ">Responses</h3><div><button class="sc-jthNAk gfsyZD"><svg class="sc-dibcMh dpIKEE" version="1.1" viewBox="0 0 24 24" x="0" xmlns="http://www.w3.org/2000/svg" y="0" aria-hidden="true"><polygon points="17.3 8.3 12 13.6 6.7 8.3 5.3 9.7 12 16.4 18.7 9.7 "></polygon></svg><strong class="sc-eOObWA ecXPYN">200<!-- --> </strong><div html="&lt;p&gt;Webhook processed successfully&lt;/p&gt;
+" class="sc-faJlkc sc-fdduAw sc-eINXvP kOqeZB kkltVg fbuMAW"><p>Webhook processed successfully</p>
+</div></button></div><div><button class="sc-jthNAk eNjFmB"><svg class="sc-dibcMh jsRtRU" version="1.1" viewBox="0 0 24 24" x="0" xmlns="http://www.w3.org/2000/svg" y="0" aria-hidden="true"><polygon points="17.3 8.3 12 13.6 6.7 8.3 5.3 9.7 12 16.4 18.7 9.7 "></polygon></svg><strong class="sc-eOObWA ecXPYN">500<!-- --> </strong><div html="&lt;p&gt;Server error&lt;/p&gt;
+" class="sc-faJlkc sc-fdduAw sc-eINXvP kOqeZB kkltVg fbuMAW"><p>Server error</p>
+</div></button></div></div></div><div class="sc-jMpmlX sc-hoLldG kCcXaS jpPJrn"><div class="sc-eUzzst cgvUrj"><button class="sc-bpAAPv ecNgtW"><span type="post" class="sc-fBpBLu bxmdGF http-verb post">post</span><span class="sc-jgoAos hgvsuc">/tap-payments/webhook</span><svg class="sc-dibcMh NOyYc" style="margin-right:-25px" version="1.1" viewBox="0 0 24 24" x="0" xmlns="http://www.w3.org/2000/svg" y="0" aria-hidden="true"><polygon points="17.3 8.3 12 13.6 6.7 8.3 5.3 9.7 12 16.4 18.7 9.7 "></polygon></svg></button><div aria-hidden="true" class="sc-dXqqap bVkkkk"><div class="sc-ijfqWo jlEXoB"><div html="&lt;p&gt;API base URL&lt;/p&gt;
+" class="sc-faJlkc sc-fdduAw kOqeZB csbUjU"><p>API base URL</p>
+</div><div tabindex="0" role="button"><div class="sc-srrxr zPpwX"><span>/api</span>/tap-payments/webhook</div></div></div></div></div><div><h3 class="sc-llIIlC fdkIVZ"> <!-- -->Request samples<!-- --> </h3><div class="sc-cTIdZS dFpYBv" data-rttabs="true"><ul class="react-tabs__tab-list" role="tablist"><li class="react-tabs__tab react-tabs__tab--selected" role="tab" id="tab«R4kta»0" aria-selected="true" aria-disabled="false" aria-controls="panel«R4kta»0" tabindex="0" data-rttab="true">Payload</li></ul><div class="react-tabs__tab-panel react-tabs__tab-panel--selected" role="tabpanel" id="panel«R4kta»0" aria-labelledby="tab«R4kta»0"><div><div class="sc-bXYrjy fpFYoG"><span class="sc-fUPiRJ TqlOY">Content type</span><div class="sc-bFwXsg caaBgn">application/json</div></div><div class="sc-bgpKpp kuvBhH"><div class="sc-dRHutB iAOzgg"><div class="sc-VILhF itwxyW"><button><div class="sc-fIQtvO indwFD">Copy</div></button><button> Expand all </button><button> Collapse all </button></div><div tabindex="0" class="sc-faJlkc kOqeZB sc-eRJQtA eudsMA"><div class="redoc-json"><code><button class="collapser" aria-label="collapse"></button><span class="token punctuation">{</span><span class="ellipsis"></span><ul class="obj collapsible"><li><div class="hoverable "><span class="property token string">"id"</span>: <span class="token string">&quot;evt_1234567890abcdef&quot;</span><span class="token punctuation">,</span></div></li><li><div class="hoverable "><span class="property token string">"event"</span>: <span class="token string">&quot;charge.succeeded&quot;</span><span class="token punctuation">,</span></div></li><li><div class="hoverable "><span class="property token string">"data"</span>: <button class="collapser" aria-label="collapse"></button><span class="token punctuation">{</span><span class="ellipsis"></span><ul class="obj collapsible"><li><div class="hoverable collapsed"><span class="property token string">"id"</span>: <span class="token string">&quot;chg_1234567890abcdef&quot;</span><span class="token punctuation">,</span></div></li><li><div class="hoverable collapsed"><span class="property token string">"amount"</span>: <span class="token number">10.5</span><span class="token punctuation">,</span></div></li><li><div class="hoverable collapsed"><span class="property token string">"currency"</span>: <span class="token string">&quot;KWD&quot;</span><span class="token punctuation">,</span></div></li><li><div class="hoverable collapsed"><span class="property token string">"status"</span>: <span class="token string">&quot;CAPTURED&quot;</span><span class="token punctuation">,</span></div></li><li><div class="hoverable collapsed"><span class="property token string">"reference"</span>: <button class="collapser" aria-label="expand"></button><span class="token punctuation">{</span><span class="ellipsis"></span><ul class="obj collapsible"><li><div class="hoverable collapsed"><span class="property token string">"transaction"</span>: <span class="token string">&quot;txn_1234567890abcdef&quot;</span><span class="token punctuation">,</span></div></li><li><div class="hoverable collapsed"><span class="property token string">"order"</span>: <span class="token string">&quot;order_12345&quot;</span></div></li></ul><span class="token punctuation">}</span><span class="token punctuation">,</span></div></li><li><div class="hoverable collapsed"><span class="property token string">"customer"</span>: <button class="collapser" aria-label="expand"></button><span class="token punctuation">{</span><span class="ellipsis"></span><ul class="obj collapsible"><li><div class="hoverable collapsed"><span class="property token string">"id"</span>: <span class="token string">&quot;cus_1234567890abcdef&quot;</span></div></li></ul><span class="token punctuation">}</span><span class="token punctuation">,</span></div></li><li><div class="hoverable collapsed"><span class="property token string">"card"</span>: <button class="collapser" aria-label="expand"></button><span class="token punctuation">{</span><span class="ellipsis"></span><ul class="obj collapsible"><li><div class="hoverable collapsed"><span class="property token string">"brand"</span>: <span class="token string">&quot;VISA&quot;</span><span class="token punctuation">,</span></div></li><li><div class="hoverable collapsed"><span class="property token string">"last_four"</span>: <span class="token string">&quot;1234&quot;</span></div></li></ul><span class="token punctuation">}</span><span class="token punctuation">,</span></div></li><li><div class="hoverable collapsed"><span class="property token string">"response"</span>: <button class="collapser" aria-label="expand"></button><span class="token punctuation">{</span><span class="ellipsis"></span><ul class="obj collapsible"><li><div class="hoverable collapsed"><span class="property token string">"code"</span>: <span class="token number">0</span><span class="token punctuation">,</span></div></li><li><div class="hoverable collapsed"><span class="property token string">"message"</span>: <span class="token string">&quot;Captured&quot;</span></div></li></ul><span class="token punctuation">}</span></div></li></ul><span class="token punctuation">}</span></div></li></ul><span class="token punctuation">}</span></code></div></div></div></div></div></div></div></div><div><h3 class="sc-llIIlC fdkIVZ"> <!-- -->Response samples<!-- --> </h3><div class="sc-cTIdZS dFpYBv" data-rttabs="true"><ul class="react-tabs__tab-list" role="tablist"><li class="tab-success react-tabs__tab--selected" role="tab" id="tab«R4sta»0" aria-selected="true" aria-disabled="false" aria-controls="panel«R4sta»0" tabindex="0" data-rttab="true">200</li><li class="tab-error" role="tab" id="tab«R4sta»1" aria-selected="false" aria-disabled="false" aria-controls="panel«R4sta»1" data-rttab="true">500</li></ul><div class="react-tabs__tab-panel react-tabs__tab-panel--selected" role="tabpanel" id="panel«R4sta»0" aria-labelledby="tab«R4sta»0"><div><div class="sc-bXYrjy fpFYoG"><span class="sc-fUPiRJ TqlOY">Content type</span><div class="sc-bFwXsg caaBgn">application/json</div></div><div class="sc-bgpKpp kuvBhH"><div class="sc-dRHutB iAOzgg"><div class="sc-VILhF itwxyW"><button><div class="sc-fIQtvO indwFD">Copy</div></button></div><div tabindex="0" class="sc-faJlkc kOqeZB sc-eRJQtA eudsMA"><div class="redoc-json"><code><button class="collapser" aria-label="collapse"></button><span class="token punctuation">{</span><span class="ellipsis"></span><ul class="obj collapsible"><li><div class="hoverable "><span class="property token string">"status"</span>: <span class="token string">&quot;received&quot;</span><span class="token punctuation">,</span></div></li><li><div class="hoverable "><span class="property token string">"message"</span>: <span class="token string">&quot;Webhook processed&quot;</span></div></li></ul><span class="token punctuation">}</span></code></div></div></div></div></div></div><div class="react-tabs__tab-panel" role="tabpanel" id="panel«R4sta»1" aria-labelledby="tab«R4sta»1"></div></div></div></div></div></div></div><div class="sc-epRJRH haiOeP"></div></div></div>
+      <script>
+      const __redoc_state = {"menu":{"activeItemIdx":-1},"spec":{"data":{"openapi":"3.0.3","info":{"title":"Tap Payments API","description":"API for processing payments through Tap Payments with Apple Pay integration.\n\nThis API allows clients to process Apple Pay payments and receive webhook notifications\nfrom Tap Payments.\n","version":"1.0.0","contact":{"name":"Development Team"}},"servers":[{"url":"/api","description":"API base URL"}],"tags":[{"name":"Payments","description":"Payment processing endpoints"},{"name":"Webhooks","description":"Webhook notification endpoints"}],"paths":{"/tap-payments/charges":{"post":{"tags":["Payments"],"summary":"Process Apple Pay payment","description":"Process a payment using Apple Pay token.\n\nThis endpoint accepts an Apple Pay token along with payment details,\nconverts it to a Tap Payments token, and creates a charge.\n","operationId":"createCharge","security":[{"sanctum":[]}],"requestBody":{"required":true,"content":{"application/json":{"schema":{"$ref":"#/components/schemas/ApplePayRequest"}}}},"responses":{"200":{"description":"Payment processed successfully","content":{"application/json":{"schema":{"$ref":"#/components/schemas/ChargeResponse"}}}},"400":{"description":"Invalid request","content":{"application/json":{"schema":{"$ref":"#/components/schemas/ErrorResponse"}}}},"401":{"description":"Unauthorized"},"422":{"description":"Validation error","content":{"application/json":{"schema":{"$ref":"#/components/schemas/ValidationErrorResponse"}}}},"500":{"description":"Server error","content":{"application/json":{"schema":{"$ref":"#/components/schemas/ErrorResponse"}}}}}}},"/tap-payments/webhook":{"post":{"tags":["Webhooks"],"summary":"Receive webhook notifications from Tap Payments","description":"Endpoint to receive webhook notifications from Tap Payments.\n\nThis endpoint processes webhook notifications for events such as\nsuccessful charges, failed charges, etc.\n","operationId":"webhook","requestBody":{"required":true,"content":{"application/json":{"schema":{"$ref":"#/components/schemas/WebhookRequest"}}}},"responses":{"200":{"description":"Webhook processed successfully","content":{"application/json":{"schema":{"$ref":"#/components/schemas/WebhookResponse"}}}},"500":{"description":"Server error","content":{"application/json":{"schema":{"$ref":"#/components/schemas/ErrorResponse"}}}}}}}},"components":{"securitySchemes":{"sanctum":{"type":"http","scheme":"bearer","bearerFormat":"JWT","description":"Laravel Sanctum authentication"}},"schemas":{"ApplePayRequest":{"type":"object","required":["amount","customer_name","customer_email","token_data"],"properties":{"amount":{"type":"number","format":"float","minimum":0.1,"example":10.5,"description":"Payment amount"},"currency":{"type":"string","default":"KWD","minLength":3,"maxLength":3,"example":"KWD","description":"Payment currency (ISO 4217 code)"},"customer_name":{"type":"string","example":"John Doe","description":"Customer name"},"customer_email":{"type":"string","format":"email","example":"john.doe@example.com","description":"Customer email"},"customer_phone":{"type":"string","example":"96512345678","description":"Customer phone number"},"description":{"type":"string","example":"Payment for order","description":"Payment description"},"reference_id":{"type":"string","example":"order_12345","description":"External reference ID"},"token_data":{"type":"object","required":["data","header","signature","version"],"properties":{"data":{"type":"string","description":"Apple Pay payment data","example":"CM8i9PNK4yXtKO3xmOn6uyYOWmQ+iX9/Oc0EWHJZnPZ/IAEe2UYNCfely3dgq3veEygmQcl0s8lvMeCIZAbbBvbZWPKng9lfUwP2u3IUOFfFyI4beE9znpQ/e0nyQiVh8NFyZun8o0/YZfdFhaBy8bunveULZkWODZy3vg1LLTk0wSRfzbiFav/krgeMvztl8U85Fefl1VJVoJbW/jtShwDkusHizw/p/hkLiOFcCYSz7h9culZQMTWfqsxIfTuY3mOl+NhjAHPP+UFv4wefXrQL9MKO2cI6ttXOp5k6M6mFV/Qe0fbmJ6GnDWDMSiikW+3eL0yi0IApAKmmVgPS+uk42dyhrnSPhB6A7EJBmhEEb3ErL1I69Jq9REjDHp+VoZR0fAbDtpbjKKMo"},"header":{"type":"object","required":["ephemeralPublicKey","publicKeyHash","transactionId"],"properties":{"ephemeralPublicKey":{"type":"string","description":"Ephemeral public key","example":"MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAELAfDie0Ie1TxCcrFt69BzcQ52+F+Fhm5mDw6pMR54AzoFMgdGPRbqoLtFpoSe0FI/m0cqRMOVM2W4Bz9jVZZHA=="},"publicKeyHash":{"type":"string","description":"Public key hash","example":"LjAAyv6vb6jOEkjfG7L1a5OR2uCTHIkB61DaYdEWD+w="},"transactionId":{"type":"string","description":"Transaction ID","example":"0c4352c073ad460044517596dbbf8fe503a837138c8c2de18fddb37ca3ec5295"}}},"signature":{"type":"string","description":"Signature","example":"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"},"version":{"type":"string","description":"Apple Pay version","example":"EC_v1"}}}}},"ChargeResponse":{"type":"object","required":["success","transaction_id","charge_id","status","payment_url"],"properties":{"success":{"type":"boolean","example":true,"description":"Whether the request was successful"},"transaction_id":{"type":"string","example":"txn_1234567890abcdef","description":"Unique transaction ID generated by our system"},"charge_id":{"type":"string","example":"chg_1234567890abcdef","description":"Charge ID returned by Tap Payments"},"status":{"type":"string","example":"pending","description":"Transaction status"},"payment_url":{"type":"string","example":"https://checkout.tap.company/v2/checkout/12345","description":"URL to redirect the user to complete the payment if needed"}}},"WebhookRequest":{"type":"object","required":["id","event","data"],"properties":{"id":{"type":"string","example":"evt_1234567890abcdef","description":"Event ID"},"event":{"type":"string","example":"charge.succeeded","description":"Event type"},"data":{"type":"object","description":"Event data","properties":{"id":{"type":"string","example":"chg_1234567890abcdef","description":"Charge ID"},"amount":{"type":"number","format":"float","example":10.5,"description":"Payment amount"},"currency":{"type":"string","example":"KWD","description":"Payment currency"},"status":{"type":"string","example":"CAPTURED","description":"Charge status"},"reference":{"type":"object","properties":{"transaction":{"type":"string","example":"txn_1234567890abcdef","description":"Transaction reference"},"order":{"type":"string","example":"order_12345","description":"Order reference"}}},"customer":{"type":"object","properties":{"id":{"type":"string","example":"cus_1234567890abcdef","description":"Customer ID"}}},"card":{"type":"object","properties":{"brand":{"type":"string","example":"VISA","description":"Card brand"},"last_four":{"type":"string","example":"1234","description":"Last four digits of the card"}}},"response":{"type":"object","properties":{"code":{"type":"string","example":0,"description":"Response code"},"message":{"type":"string","example":"Captured","description":"Response message"}}}}}}},"WebhookResponse":{"type":"object","required":["status"],"properties":{"status":{"type":"string","example":"received","description":"Status of the webhook processing"},"message":{"type":"string","example":"Webhook processed","description":"Additional information about the webhook processing"}}},"ErrorResponse":{"type":"object","required":["success","message"],"properties":{"success":{"type":"boolean","example":false,"description":"Whether the request was successful"},"message":{"type":"string","example":"An error occurred while processing the payment","description":"Error message"},"error":{"type":"string","example":"Invalid token data","description":"Detailed error information"}}},"ValidationErrorResponse":{"type":"object","required":["success","message","errors"],"properties":{"success":{"type":"boolean","example":false,"description":"Whether the request was successful"},"message":{"type":"string","example":"Validation failed","description":"Error message"},"errors":{"type":"object","additionalProperties":{"type":"array","items":{"type":"string"}},"example":{"amount":["The amount field is required.","The amount must be at least 0.1."],"token_data":["The token data field is required."]},"description":"Validation errors"}}}}}}},"searchIndex":{"store":["tag/Payments","tag/Payments/operation/createCharge","tag/Webhooks","tag/Webhooks/operation/webhook"],"index":{"version":"2.3.9","fields":["title","description"],"fieldVectors":[["title/0",[0,0.281]],["description/0",[0,0.297,1,0.151,2,0.151]],["title/1",[0,0.175,1,0.089,3,0.584,4,0.584]],["description/1",[0,0.275,1,0.078,2,0.078,3,0.766,4,0.766,5,0.889,6,1.596,7,0.889,8,0.889,9,0.889,10,0.889,11,0.263,12,0.889,13,0.512,14,0.889]],["title/2",[15,0.142]],["description/2",[2,0.151,15,0.151,16,0.51]],["title/3",[0,0.156,11,0.267,15,0.079,16,0.267,17,0.519]],["description/3",[0,0.167,1,0.085,2,0.124,11,0.286,13,0.815,15,0.124,16,0.42,17,0.557,18,0.967,19,0.967,20,0.967,21,0.967,22,0.967,23,0.967]]],"invertedIndex":[["accept",{"_index":7,"title":{},"description":{"1":{}}}],["along",{"_index":8,"title":{},"description":{"1":{}}}],["appl",{"_index":3,"title":{"1":{}},"description":{"1":{}}}],["charg",{"_index":13,"title":{},"description":{"1":{},"3":{}}}],["convert",{"_index":10,"title":{},"description":{"1":{}}}],["creat",{"_index":12,"title":{},"description":{"1":{}}}],["detail",{"_index":9,"title":{},"description":{"1":{}}}],["endpoint",{"_index":2,"title":{},"description":{"0":{},"1":{},"2":{},"3":{}}}],["etc",{"_index":22,"title":{},"description":{"3":{}}}],["event",{"_index":18,"title":{},"description":{"3":{}}}],["fail",{"_index":21,"title":{},"description":{"3":{}}}],["notif",{"_index":16,"title":{"3":{}},"description":{"2":{},"3":{}}}],["pay",{"_index":4,"title":{"1":{}},"description":{"1":{}}}],["payment",{"_index":0,"title":{"0":{},"1":{},"3":{}},"description":{"0":{},"1":{},"3":{}}}],["process",{"_index":1,"title":{"1":{}},"description":{"0":{},"1":{},"3":{}}}],["receiv",{"_index":17,"title":{"3":{}},"description":{"3":{}}}],["success",{"_index":20,"title":{},"description":{"3":{}}}],["such",{"_index":19,"title":{},"description":{"3":{}}}],["tap",{"_index":11,"title":{"3":{}},"description":{"1":{},"3":{}}}],["tap-payments/charg",{"_index":14,"title":{},"description":{"1":{}}}],["tap-payments/webhook",{"_index":23,"title":{},"description":{"3":{}}}],["token",{"_index":6,"title":{},"description":{"1":{}}}],["us",{"_index":5,"title":{},"description":{"1":{}}}],["webhook",{"_index":15,"title":{"2":{},"3":{}},"description":{"2":{},"3":{}}}]],"pipeline":[]}},"options":{}};
+
+      var container = document.getElementById('redoc');
+      Redoc.hydrate(__redoc_state, container);
+
+      </script>
+</body>
+
+</html>
