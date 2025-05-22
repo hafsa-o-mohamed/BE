@@ -48,8 +48,6 @@ class TapPaymentController extends Controller
         // Validate request
         $validated = $request->validate([
             'amount' => 'required|numeric|min:0.1',
-            'customer_name' => 'required|string',
-            'customer_email' => 'required|email',
             'description' => 'nullable|string',
             'reference_id' => 'nullable|string',
             'token_data' => 'required|array',
@@ -63,18 +61,26 @@ class TapPaymentController extends Controller
         ]);
 
         try {
+            // Infer user
+            $user = auth()->user();
+            if (!$user) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Unauthenticated. Please log in.'
+                ], 401);
+            }
             // Prepare payment data
             $paymentData = [
                 'amount' => $validated['amount'],
                 'currency' => 'KWD',
                 'description' => $validated['description'] ?? 'Payment',
-                'customer_name' => $validated['customer_name'],
-                'customer_email' => $validated['customer_email'],
+                'customer_name' => $user->name,
+                'customer_email' => $user->email,
                 'customer_phone' => $request->input('customer_phone'),
                 'reference_id' => $validated['reference_id'] ?? null,
                 'token_data' => $validated['token_data'],
                 'ip_address' => $request->ip(),
-                'user_id' => auth()->id(),
+                'user_id' => $user->id,
             ];
 
             // Process the Apple Pay payment
