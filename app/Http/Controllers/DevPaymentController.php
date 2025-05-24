@@ -13,8 +13,18 @@ class DevPaymentController extends Controller
      * Tap Payments API Configuration
      */
     private const TAP_API_BASE = 'https://api.tap.company';
-    private const SECRET_KEY = 'sk_test_XKokBfNWv6FIYuTMg5sLPjhJ';
-    private const PUBLISHABLE_KEY = 'pk_test_EtHFV4BuPQokJT6jiROls87Y';
+    //TAPPAY1_TEST_SECRET_KEY=REDACTED_SECRET_KEY
+    // private const SECRET_KEY = config('services.tap.secret_key');
+    // TAPPAY1_TEST_PUBLIC_KEY=pk_test_82x9FugWswyJjOp6GiSX0Nk5
+    // private const PUBLISHABLE_KEY = config('services.tap.public_key');
+    private string $SECRET_KEY;
+    private string $PUBLISHABLE_KEY;
+
+    public function __construct()
+    {
+        $this->SECRET_KEY = config('services.tap.secret_key');
+        $this->PUBLISHABLE_KEY = config('services.tap.public_key');
+    }
 
     /**
      * Test cards data based on common payment processor test cards
@@ -164,7 +174,7 @@ class DevPaymentController extends Controller
 
             // Make actual API call to Tap Payments
             $response = Http::withHeaders([
-                'Authorization' => 'Bearer ' . self::SECRET_KEY,
+                'Authorization' => 'Bearer ' . $this->SECRET_KEY,
                 'Content-Type' => 'application/json',
             ])->post(self::TAP_API_BASE . '/v2/tokens', $payload);
 
@@ -267,7 +277,7 @@ class DevPaymentController extends Controller
 
             // Make actual API call to Tap Payments
             $response = Http::withHeaders([
-                'Authorization' => 'Bearer ' . self::SECRET_KEY,
+                'Authorization' => 'Bearer ' . $this->SECRET_KEY,
                 'Content-Type' => 'application/json',
             ])->post(self::TAP_API_BASE . '/v2/charges', $payload);
 
@@ -521,7 +531,7 @@ class DevPaymentController extends Controller
             }
 
             // Create hash using HMAC SHA256 with secret key
-            $calculatedHashString = hash_hmac('sha256', $toBeHashedString, self::SECRET_KEY);
+            $calculatedHashString = hash_hmac('sha256', $toBeHashedString, $this->SECRET_KEY);
             $this->lastCalculatedHash = $calculatedHashString;
             
             Log::info('Hash validation', [
@@ -673,5 +683,173 @@ class DevPaymentController extends Controller
         }
         
         return 'UNKNOWN';
+    }
+
+    /**
+     * Create a token from Apple Pay token using Tap Payments API
+     * 
+     * Implementation based on Apple Pay integration documentation:
+     * - Converts Apple Pay payment tokens to Tap tokens
+     * - Requires Apple Pay token_data with encrypted payment information
+     * - Returns standard Tap token for use in charges/authorize calls
+     * 
+     * Apple Pay token contains:
+     * - Encrypted payment data from Apple's secure element
+     * - Transaction header with public keys and transaction ID
+     * - Digital signature for verification
+     * - Version information for compatibility
+     */
+    public function createApplePayToken(Request $request)
+    {
+        Log::info('Apple Pay token conversion request received', [
+            'client_ip' => $request->ip(),
+            'user_agent' => $request->header('User-Agent'),
+            'token_data' => $request->input('token_data'),
+            'request_size' => strlen(json_encode($request->all()))
+        ]);
+
+        // $request->validate([
+        //     'token_data' => 'required|array',
+        //     'token_data.data' => 'required|string',
+        //     'token_data.header' => 'required|array',
+        //     'token_data.header.transactionId' => 'required|string',
+        //     'token_data.header.publicKeyHash' => 'required|string',
+        //     'token_data.header.ephemeralPublicKey' => 'required|string',
+        //     'token_data.signature' => 'required|string',
+        //     'token_data.version' => 'required|string',
+        // ]);
+        $request->validate([
+            'token_data' => 'required|array',
+            'token_data.jsonAppleToken' => 'required|array',
+            'token_data.jsonAppleToken.version' => 'required|string',
+            'token_data.jsonAppleToken.data' => 'required|string',
+            'token_data.jsonAppleToken.header' => 'required|array',
+            'token_data.jsonAppleToken.header.transactionId' => 'required|string',
+            'token_data.jsonAppleToken.header.publicKeyHash' => 'required|string',
+            'token_data.jsonAppleToken.header.ephemeralPublicKey' => 'required|string',
+            'token_data.jsonAppleToken.signature' => 'required|string',
+
+            // You might also want to validate the other fields if they are important for your logic,
+            // though they are not part of the standard Apple Pay token structure that Tap Payments expects.
+            // 'token_data.transactionIdentifier' => 'sometimes|string',
+            // 'token_data.network' => 'sometimes|string',
+            // 'token_data.displayName' => 'sometimes|string',
+            // 'token_data.stringAppleToken' => 'sometimes|string', // This is just a string version of jsonAppleToken
+            // 'token_data.type' => 'sometimes|string', // This seems to be 'unknown'
+        ]);
+
+        try {
+            Log::info('Validating Apple Pay token structure', [
+                'data_length' => strlen($request->input('token_data.data')),
+                'version' => $request->input('token_data.version'),
+                'transaction_id' => $request->input('token_data.header.transactionId'),
+                'has_signature' => !empty($request->input('token_data.signature'))
+            ]);
+
+            // Prepare the request payload as per Tap API Apple Pay documentation
+            $payload = [
+                'type' => 'applepay',
+                'token_data' => [
+                    'data' => $request->input('token_data.data'),
+                    'header' => [
+                        'transactionId' => $request->input('token_data.header.transactionId'),
+                        'publicKeyHash' => $request->input('token_data.header.publicKeyHash'),
+                        'ephemeralPublicKey' => $request->input('token_data.header.ephemeralPublicKey'),
+                    ],
+                    'signature' => $request->input('token_data.signature'),
+                    'version' => $request->input('token_data.version'),
+                ],
+                'client_ip' => $request->ip()
+            ];
+
+            Log::info('Prepared Apple Pay token payload for Tap API', [
+                'payload_structure' => [
+                    'type' => $payload['type'],
+                    'client_ip' => $payload['client_ip'],
+                    'token_data_keys' => array_keys($payload['token_data']),
+                    'header_keys' => array_keys($payload['token_data']['header']),
+                ]
+            ]);
+
+            // Make actual API call to Tap Payments
+            Log::info('Making API call to Tap Payments for Apple Pay token conversion');
+            
+            $response = Http::withHeaders([
+                'Authorization' => 'Bearer ' . $this->SECRET_KEY,
+                'Content-Type' => 'application/json',
+                'Accept' => 'application/json',
+            ])->post(self::TAP_API_BASE . '/v2/tokens', $payload);
+
+            Log::info('Tap API response received', [
+                'status_code' => $response->status(),
+                'response_size' => strlen($response->body()),
+                'has_response_body' => !empty($response->body()),
+                'body' => $response->body()
+
+            ]);
+
+            if ($response->successful()) {
+                $tokenData = $response->json();
+                
+                Log::info('Apple Pay token conversion successful', [
+                    'tap_token_id' => $tokenData['id'] ?? 'unknown',
+                    'token_created' => $tokenData['created'] ?? 'unknown',
+                    'token_used' => $tokenData['used'] ?? false,
+                    'card_info' => [
+                        'first_six' => $tokenData['card']['first_six'] ?? 'unknown',
+                        'last_four' => $tokenData['card']['last_four'] ?? 'unknown',
+                        'brand' => $tokenData['card']['brand'] ?? 'unknown',
+                        'scheme' => $tokenData['card']['scheme'] ?? 'unknown',
+                    ]
+                ]);
+
+                return response()->json([
+                    'success' => true,
+                    'token' => $tokenData,
+                    'debug' => [
+                        'conversion_type' => 'apple_pay_to_tap_token',
+                        'apple_pay_version' => $payload['token_data']['version'],
+                        'note' => 'Real API response from Tap Payments Apple Pay conversion'
+                    ]
+                ]);
+            } else {
+                $errorData = $response->json();
+                
+                Log::error('Apple Pay token conversion failed', [
+                    'status_code' => $response->status(),
+                    'error_response' => $errorData,
+                    'error_type' => $errorData['error']['type'] ?? 'unknown',
+                    'error_code' => $errorData['error']['code'] ?? 'unknown',
+                    'error_message' => $errorData['error']['message'] ?? 'unknown'
+                ]);
+                
+                return response()->json([
+                    'success' => false,
+                    'error' => $errorData['errors'] ?? $errorData['error']['message'] ?? 'Apple Pay token conversion failed',
+                    'debug' => [
+                        'status' => $response->status(),
+                        'response' => $errorData,
+                        'conversion_type' => 'apple_pay_to_tap_token'
+                    ]
+                ], $response->status());
+            }
+
+        } catch (\Exception $e) {
+            Log::error('Apple Pay token conversion exception', [
+                'error_message' => $e->getMessage(),
+                'error_file' => $e->getFile(),
+                'error_line' => $e->getLine(),
+                'request_data' => $request->all()
+            ]);
+            
+            return response()->json([
+                'success' => false,
+                'error' => 'Internal server error during Apple Pay token conversion: ' . $e->getMessage(),
+                'debug' => [
+                    'conversion_type' => 'apple_pay_to_tap_token',
+                    'exception_class' => get_class($e)
+                ]
+            ], 500);
+        }
     }
 } 

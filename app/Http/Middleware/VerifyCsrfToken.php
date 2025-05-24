@@ -13,5 +13,6 @@ class VerifyCsrfToken extends Middleware
      */
     protected $except = [
         'dev/payments/webhook',
+        'dev/payments/tokens/apple-pay',
     ];
 }

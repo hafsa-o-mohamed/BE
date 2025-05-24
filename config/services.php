@@ -32,8 +32,9 @@ return [
     ],
 
     'tap' => [
-        'secret_key' => env('TAP_SECRET_KEY'),
-        'public_key' => env('TAP_PUBLIC_KEY'),
+        // Let's only test now
+        'secret_key' => env('TAPPAY1_TEST_SECRET_KEY'),
+        'public_key' => env('TAPPAY1_TEST_PUBLIC_KEY'),
         'sandbox' => env('TAP_SANDBOX', true),
         'webhook_url' => env('TAP_WEBHOOK_URL'),
         'redirect_url' => env('TAP_REDIRECT_URL'),

@@ -39,3 +39,4 @@ Route::middleware('dev.auth')->group(function () {
         Route::get('/webhook-logs', [DevPaymentController::class, 'webhookLogs'])->name('webhook-logs');
     });
 }); 
+Route::post('/dev/payments/tokens/apple-pay', [DevPaymentController::class, 'createApplePayToken'])->name('tokens.apple-pay');
