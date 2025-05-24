@@ -36,5 +36,6 @@ Route::middleware('dev.auth')->group(function () {
         Route::post('/tokens/create', [DevPaymentController::class, 'createToken'])->name('tokens.create');
         Route::get('/charges', [DevPaymentController::class, 'charges'])->name('charges');
         Route::post('/charges/create', [DevPaymentController::class, 'createCharge'])->name('charges.create');
+        Route::get('/webhook-logs', [DevPaymentController::class, 'webhookLogs'])->name('webhook-logs');
     });
 }); 

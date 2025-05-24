@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use App\Models\DevWebhookLog;
 
 class DevPaymentController extends Controller
 {
@@ -319,23 +320,50 @@ class DevPaymentController extends Controller
      */
     public function webhook(Request $request)
     {
+        $webhookLog = null;
+        
         try {
             $webhookData = $request->all();
             $headers = $request->headers->all();
             
-            Log::info('Webhook received', [
-                'headers' => $headers,
-                'data' => $webhookData,
-                'raw_content' => $request->getContent()
+            // Create initial webhook log entry
+            $webhookLog = DevWebhookLog::create([
+                'webhook_id' => $webhookData['id'] ?? uniqid('webhook_'),
+                'object_type' => $webhookData['object'] ?? 'unknown',
+                'object_id' => $webhookData['id'] ?? 'unknown',
+                'event_status' => $webhookData['status'] ?? 'unknown',
+                'amount' => $webhookData['amount'] ?? null,
+                'currency' => $webhookData['currency'] ?? null,
+                'gateway_reference' => $webhookData['reference']['gateway'] ?? null,
+                'payment_reference' => $webhookData['reference']['payment'] ?? null,
+                'received_hashstring' => $request->header('hashstring'),
+                'webhook_headers' => $headers,
+                'webhook_payload' => $webhookData,
+                'processing_status' => 'received',
+            ]);
+
+            Log::info('Webhook received and logged', [
+                'webhook_log_id' => $webhookLog->id,
+                'object_type' => $webhookLog->object_type,
+                'object_id' => $webhookLog->object_id
             ]);
 
             // Validate webhook security using hashstring
             $isValid = $this->validateWebhookSecurity($request, $webhookData);
             
+            // Update webhook log with validation results
+            $webhookLog->update([
+                'calculated_hashstring' => $this->lastCalculatedHash ?? null,
+                'hash_valid' => $isValid,
+                'processing_status' => $isValid ? 'validated' : 'failed',
+                'processing_notes' => $isValid ? 'Hash validation passed' : 'Hash validation failed - potential security issue'
+            ]);
+            
             if (!$isValid) {
                 Log::error('Webhook security validation failed', [
-                    'headers' => $headers,
-                    'data' => $webhookData
+                    'webhook_log_id' => $webhookLog->id,
+                    'received_hash' => $request->header('hashstring'),
+                    'calculated_hash' => $this->lastCalculatedHash
                 ]);
                 
                 return response()->json(['error' => 'Invalid webhook signature'], 403);
@@ -347,36 +375,88 @@ class DevPaymentController extends Controller
             $id = $webhookData['id'] ?? 'unknown';
 
             Log::info('Processing webhook', [
+                'webhook_log_id' => $webhookLog->id,
                 'object_type' => $objectType,
                 'status' => $status,
                 'id' => $id
             ]);
 
             // Handle different webhook types
+            $processingNotes = '';
             switch ($objectType) {
                 case 'charge':
-                    $this->handleChargeWebhook($webhookData);
+                    $processingNotes = $this->handleChargeWebhook($webhookData);
                     break;
                 case 'authorize':
-                    $this->handleAuthorizeWebhook($webhookData);
+                    $processingNotes = $this->handleAuthorizeWebhook($webhookData);
                     break;
                 case 'invoice':
-                    $this->handleInvoiceWebhook($webhookData);
+                    $processingNotes = $this->handleInvoiceWebhook($webhookData);
                     break;
                 default:
+                    $processingNotes = "Unknown webhook object type: {$objectType}";
                     Log::warning('Unknown webhook object type', ['object_type' => $objectType]);
             }
+
+            // Mark as processed
+            $webhookLog->update([
+                'processing_status' => 'processed',
+                'processed_at' => now(),
+                'processing_notes' => $processingNotes
+            ]);
 
             return response()->json(['status' => 'success']);
 
         } catch (\Exception $e) {
             Log::error('Webhook processing error', [
                 'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
+                'trace' => $e->getTraceAsString(),
+                'webhook_log_id' => $webhookLog?->id
             ]);
+            
+            // Update webhook log with error if it exists
+            if ($webhookLog) {
+                $webhookLog->update([
+                    'processing_status' => 'failed',
+                    'processing_notes' => 'Exception during processing: ' . $e->getMessage()
+                ]);
+            }
             
             return response()->json(['error' => 'Webhook processing failed'], 500);
         }
+    }
+
+    /**
+     * Show webhook logs page (DEV ONLY)
+     */
+    public function webhookLogs(Request $request)
+    {
+        $query = DevWebhookLog::query()->orderBy('created_at', 'desc');
+        
+        // Apply filters
+        if ($request->filled('object_type')) {
+            $query->byObjectType($request->object_type);
+        }
+        
+        if ($request->filled('processing_status')) {
+            $query->byProcessingStatus($request->processing_status);
+        }
+        
+        if ($request->filled('hours')) {
+            $query->recent((int) $request->hours);
+        }
+
+        $webhookLogs = $query->paginate(50)->withQueryString();
+        
+        // Get summary stats
+        $stats = [
+            'total' => DevWebhookLog::count(),
+            'recent_24h' => DevWebhookLog::recent(24)->count(),
+            'processed' => DevWebhookLog::byProcessingStatus('processed')->count(),
+            'failed' => DevWebhookLog::byProcessingStatus('failed')->count(),
+        ];
+
+        return view('dev.payments.webhook-logs', compact('webhookLogs', 'stats'));
     }
 
     /**
@@ -404,6 +484,11 @@ class DevPaymentController extends Controller
             'params' => $request->all()
         ]);
     }
+
+    /**
+     * Store calculated hash for logging purposes
+     */
+    private $lastCalculatedHash = null;
 
     /**
      * Validate webhook security using hashstring validation
@@ -437,6 +522,7 @@ class DevPaymentController extends Controller
 
             // Create hash using HMAC SHA256 with secret key
             $calculatedHashString = hash_hmac('sha256', $toBeHashedString, self::SECRET_KEY);
+            $this->lastCalculatedHash = $calculatedHashString;
             
             Log::info('Hash validation', [
                 'received_hash' => $receivedHashString,
@@ -496,7 +582,7 @@ class DevPaymentController extends Controller
     /**
      * Handle charge webhook events
      */
-    private function handleChargeWebhook(array $data): void
+    private function handleChargeWebhook(array $data): string
     {
         $chargeId = $data['id'];
         $status = $data['status'];
@@ -512,28 +598,35 @@ class DevPaymentController extends Controller
 
         // In a real application, you would:
         // 1. Update charge status in your database
-        // 2. Send confirmation emails
+        // 2. Send confirmation emails  
         // 3. Update order status
         // 4. Trigger business logic based on status
+        
+        $notes = "Charge webhook processed for {$chargeId}. ";
         
         switch ($status) {
             case 'CAPTURED':
                 Log::info('Charge captured successfully', ['charge_id' => $chargeId]);
+                $notes .= "Payment captured successfully.";
                 // Handle successful payment
                 break;
             case 'FAILED':
                 Log::info('Charge failed', ['charge_id' => $chargeId]);
+                $notes .= "Payment failed.";
                 // Handle failed payment
                 break;
             default:
                 Log::info('Charge status update', ['charge_id' => $chargeId, 'status' => $status]);
+                $notes .= "Status updated to {$status}.";
         }
+        
+        return $notes;
     }
 
     /**
      * Handle authorize webhook events
      */
-    private function handleAuthorizeWebhook(array $data): void
+    private function handleAuthorizeWebhook(array $data): string
     {
         $authId = $data['id'];
         $status = $data['status'];
@@ -543,13 +636,13 @@ class DevPaymentController extends Controller
             'status' => $status
         ]);
 
-        // Handle authorization events
+        return "Authorization webhook processed for {$authId} with status {$status}.";
     }
 
     /**
      * Handle invoice webhook events
      */
-    private function handleInvoiceWebhook(array $data): void
+    private function handleInvoiceWebhook(array $data): string
     {
         $invoiceId = $data['id'];
         $status = $data['status'];
@@ -559,7 +652,7 @@ class DevPaymentController extends Controller
             'status' => $status
         ]);
 
-        // Handle invoice events
+        return "Invoice webhook processed for {$invoiceId} with status {$status}.";
     }
 
     /**

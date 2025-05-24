@@ -121,6 +121,20 @@
                         @endif
                     </a>
                 </li>
+
+                <!-- Webhook Logs (DEV) -->
+                <li>
+                    <a href="{{ route('dev.payments.webhook-logs') }}" class="group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold {{ request()->routeIs('dev.payments.webhook-logs') ? 'bg-primary-50 text-primary-700' : 'text-gray-700 hover:text-primary-700 hover:bg-gray-50' }} transition-colors">
+                        <svg class="h-5 w-5 shrink-0 {{ request()->routeIs('dev.payments.webhook-logs') ? 'text-primary-700' : 'text-gray-400 group-hover:text-primary-700' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                        </svg>
+                        Webhook Logs
+                        <span class="ml-auto inline-flex items-center rounded-full bg-red-100 text-red-700 px-1.5 py-0.5 text-xs font-medium">DEV</span>
+                        @if(request()->routeIs('dev.payments.webhook-logs'))
+                            <div class="ml-auto h-1.5 w-1.5 rounded-full bg-primary-600"></div>
+                        @endif
+                    </a>
+                </li>
             </ul>
         </li>
 
