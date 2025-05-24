@@ -2,28 +2,8 @@
 
 @section('title', 'Developer Dashboard')
 
-@section('header')
-    <div class="flex items-center justify-between">
-        <div>
-            <h1 class="text-3xl font-bold tracking-tight text-gray-900">Developer Dashboard</h1>
-            <p class="mt-2 text-sm text-gray-600">Welcome to your development environment</p>
-        </div>
-        <div>
-            <form action="{{ route('dev.logout') }}" method="POST" class="inline">
-                @csrf
-                <button type="submit" class="inline-flex items-center rounded-md bg-red-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600 transition-colors">
-                    <svg class="-ml-0.5 mr-1.5 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
-                    </svg>
-                    Logout
-                </button>
-            </form>
-        </div>
-    </div>
-@endsection
-
 @section('content')
-<div class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+<div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
     <!-- Server Time Card -->
     <div class="bg-white overflow-hidden shadow rounded-lg">
         <div class="px-4 py-5 sm:p-6">
