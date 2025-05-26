@@ -169,7 +169,7 @@ class DevPaymentController extends Controller
                         'avenue' => $request->address_avenue ?? '',
                     ]
                 ],
-                'client_ip' => $request->header('CF-Connecting-IP') ?? $request->ip()
+                'client_ip' => $request->ip()
             ];
 
             // Make actual API call to Tap Payments
