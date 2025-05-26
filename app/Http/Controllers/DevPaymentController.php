@@ -13,10 +13,9 @@ class DevPaymentController extends Controller
      * Tap Payments API Configuration
      */
     private const TAP_API_BASE = 'https://api.tap.company';
-    //TAPPAY1_TEST_SECRET_KEY=REDACTED_SECRET_KEY
-    // private const SECRET_KEY = config('services.tap.secret_key');
-    // TAPPAY1_TEST_PUBLIC_KEY=pk_test_82x9FugWswyJjOp6GiSX0Nk5
-    // private const PUBLISHABLE_KEY = config('services.tap.public_key');
+    // Configuration keys are loaded from config/services.php
+    // TAPPAY1_TEST_SECRET_KEY should be set in .env file
+    // TAPPAY1_TEST_PUBLIC_KEY should be set in .env file
     private string $SECRET_KEY;
     private string $PUBLISHABLE_KEY;
 
